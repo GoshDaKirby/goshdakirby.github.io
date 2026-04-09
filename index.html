@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joshua Easo — Portfolio</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --red:#e8001a;
+  --black:#080808;
+  --white:#f2ece0;
+}
+
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:var(--black);
+  font-family:'Arial Black','Arial Bold',Arial,sans-serif;
+  cursor:none;
+  user-select:none;
+}
+
+#cur{
+  position:fixed;z-index:9999;pointer-events:none;
+  width:10px;height:10px;
+  background:var(--red);
+  transform:translate(-50%,-50%) rotate(45deg);
+  box-shadow:0 0 8px var(--red);
+}
+
+.scan{
+  position:fixed;inset:0;z-index:800;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
+}
+
+.bg{position:fixed;inset:0;overflow:hidden;}
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.bg::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-55deg,transparent 0,transparent 38px,rgba(255,255,255,0.018) 38px,rgba(255,255,255,0.018) 39px);
+  pointer-events:none;z-index:1;
+}
+.bg::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(0,0,0,0.7) 100%);
+  pointer-events:none;z-index:2;
+}
+.hl{position:absolute;left:-5%;width:110%;height:1px;background:var(--red);}
+.hl1{top:8%;transform:rotate(-2deg);opacity:0.5;box-shadow:0 0 12px var(--red);}
+.hl2{top:8.4%;transform:rotate(-2deg);opacity:0.15;}
+.hl3{bottom:12%;transform:rotate(-1.5deg);opacity:0.3;}
+
+.shell{
+  position:fixed;inset:0;z-index:100;
+  display:grid;
+  grid-template-columns:1fr 460px;
+}
+
+/* LEFT */
+.identity{
+  position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 0 5rem 4rem;
+  overflow:hidden;
+}
+.id-slab{
+  position:absolute;bottom:0;left:-10%;
+  width:70%;height:55%;
+  background:var(--red);
+  clip-path:polygon(0 30%,90% 0%,100% 100%,0% 100%);
+  opacity:0.06;z-index:-1;
+}
+.id-vert{
+  position:absolute;left:1.2rem;top:50%;transform:translateY(-50%) rotate(-90deg);
+  font-size:0.5rem;letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(242,236,224,0.08);font-family:Arial,sans-serif;white-space:nowrap;
+}
+.id-year{
+  position:absolute;top:3rem;left:4rem;
+  font-size:0.55rem;letter-spacing:0.2em;
+  color:rgba(232,0,26,0.35);font-family:Arial,sans-serif;
+}
+.id-eyebrow{
+  font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;
+  color:var(--red);margin-bottom:1rem;
+  font-family:Arial,sans-serif;font-weight:400;
+  display:flex;align-items:center;gap:1rem;
+}
+.id-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--red);}
+.id-name{
+  font-size:clamp(3.5rem,7vw,5.5rem);
+  font-weight:900;letter-spacing:-0.02em;line-height:0.92;
+  text-transform:uppercase;
+}
+.id-name .first{
+  display:block;color:var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.55),6px 6px 0 rgba(0,0,0,0.85);
+}
+.id-name .last{
+  display:block;
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.25),6px 6px 0 rgba(0,0,0,0.9);
+  margin-top:0.1em;
+}
+.id-role{
+  margin-top:1.5rem;
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);
+  display:flex;align-items:center;gap:1rem;
+}
+.id-role::after{content:'';width:50px;height:1px;background:rgba(242,236,224,0.12);}
+
+/* DIAGONAL CUT */
+.cut{
+  position:absolute;top:0;right:-1px;
+  width:60px;height:100%;z-index:50;
+  background:var(--black);
+  clip-path:polygon(55% 0%,100% 0%,100% 100%,0% 100%);
+}
+.cut-line{
+  position:absolute;top:0;right:58px;
+  width:2px;height:100%;
+  background:linear-gradient(to bottom,transparent 0%,var(--red) 15%,var(--red) 85%,transparent 100%);
+  transform:skewX(-6deg);
+  box-shadow:0 0 16px rgba(232,0,26,0.6),-3px 0 24px rgba(232,0,26,0.25);
+  z-index:51;
+}
+
+/* RIGHT PANEL */
+.panel{
+  background:rgba(8,8,8,0.97);
+  border-left:1px solid rgba(232,0,26,0.12);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:3rem 2.5rem 5rem 3rem;
+  position:relative;overflow:hidden;
+}
+.panel::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(rgba(232,0,26,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,0,26,0.025) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,0.4) 0%,transparent 100%);
+}
+.corner{
+  position:absolute;top:0;right:0;width:0;height:0;
+  border-style:solid;border-width:0 55px 55px 0;
+  border-color:transparent rgba(232,0,26,0.1) transparent transparent;
+}
+.panel-label{
+  font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(232,0,26,0.55);margin-bottom:2rem;
+  font-family:Arial,sans-serif;font-weight:400;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.panel-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(232,0,26,0.4),transparent);}
+
+/* MENU */
+.menu{list-style:none;position:relative;}
+.mi{
+  position:relative;display:flex;align-items:center;
+  gap:0;padding:0;margin:0;cursor:none;height:62px;overflow:visible;
+}
+.mi-frame{
+  position:absolute;inset:4px 0;
+  clip-path:polygon(0% 0%,97% 0%,100% 50%,97% 100%,0% 100%);
+  background:linear-gradient(90deg,rgba(232,0,26,0.22),rgba(232,0,26,0.04));
+  opacity:0;transform:translateX(-20px);
+  transition:opacity 0.18s ease,transform 0.18s cubic-bezier(0.23,1,0.32,1);
+}
+.mi.active .mi-frame{opacity:1;transform:translateX(0);}
+.mi-bar{
+  position:absolute;left:0;top:12px;bottom:12px;width:3px;
+  background:var(--red);
+  box-shadow:0 0 10px var(--red),0 0 20px rgba(232,0,26,0.4);
+  opacity:0;transform:scaleY(0);transform-origin:center;
+  transition:opacity 0.15s,transform 0.15s cubic-bezier(0.23,1,0.32,1);
+}
+.mi.active .mi-bar{opacity:1;transform:scaleY(1);}
+.mi-num{
+  width:3rem;flex-shrink:0;padding-left:0.75rem;
+  font-size:0.55rem;letter-spacing:0.1em;
+  color:rgba(232,0,26,0.3);font-family:Arial,sans-serif;
+  transition:color 0.15s;z-index:1;
+}
+.mi.active .mi-num{color:var(--red);}
+.mi-arr{
+  width:0;height:0;flex-shrink:0;
+  border:solid transparent;border-width:4px 0 4px 6px;
+  border-left-color:transparent;margin-right:0.85rem;
+  transition:border-left-color 0.15s,filter 0.15s;z-index:1;
+}
+.mi.active .mi-arr{border-left-color:var(--red);filter:drop-shadow(0 0 4px var(--red));}
+.mi-text{flex:1;z-index:1;}
+.mi-label{
+  font-size:1.2rem;font-weight:900;letter-spacing:0.04em;
+  text-transform:uppercase;line-height:1;
+  color:rgba(242,236,224,0.22);
+  transition:color 0.15s,text-shadow 0.15s;
+}
+.mi.active .mi-label{
+  color:var(--white);
+  text-shadow:2px 2px 0 rgba(232,0,26,0.65),4px 4px 0 rgba(0,0,0,0.85);
+}
+.mi-sub{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.12);margin-top:2px;
+  transition:color 0.15s;
+}
+.mi.active .mi-sub{color:rgba(242,236,224,0.42);}
+.mi-tag{
+  flex-shrink:0;z-index:1;
+  font-family:Arial,sans-serif;font-size:0.5rem;font-weight:400;
+  letter-spacing:0.12em;text-transform:uppercase;
+  padding:0.2rem 0.55rem;
+  border:1px solid rgba(232,0,26,0.18);
+  color:rgba(232,0,26,0.28);
+  transition:all 0.15s;
+}
+.mi.active .mi-tag{
+  border-color:var(--red);color:var(--red);
+  box-shadow:0 0 8px rgba(232,0,26,0.2);
+}
+.mi::after{
+  content:'';position:absolute;bottom:0;left:3rem;right:0;
+  height:1px;background:linear-gradient(90deg,rgba(242,236,224,0.05),transparent);
+}
+.mi-geo{
+  position:absolute;inset:0;overflow:visible;
+  pointer-events:none;z-index:0;
+  opacity:0;transition:opacity 0.3s ease;
+}
+.mi.active .mi-geo{opacity:1;}
+
+/* STATUS BAR */
+.statusbar{
+  position:absolute;bottom:0;left:0;right:0;height:44px;
+  background:var(--red);
+  clip-path:polygon(0 35%,100% 0%,100% 100%,0% 100%);
+  display:flex;align-items:flex-end;padding:0 2.5rem 0.7rem;z-index:200;
+}
+.sb-hints{
+  display:flex;gap:2rem;
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(0,0,0,0.65);font-weight:700;
+}
+.sb-key{
+  background:rgba(0,0,0,0.2);padding:0.05rem 0.35rem;
+  border-radius:2px;color:rgba(0,0,0,0.8);margin-right:0.35rem;
+}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;inset:0;z-index:600;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(6,6,6,0.97);
+  pointer-events:none;opacity:0;
+  transition:opacity 0.2s;
+}
+.overlay.open{pointer-events:all;opacity:1;}
+.overlay-inner{
+  width:100%;max-width:640px;
+  transform:translateX(60px) skewX(-2deg);
+  opacity:0;
+  transition:transform 0.35s cubic-bezier(0.23,1,0.32,1),opacity 0.3s ease;
+}
+.overlay.open .overlay-inner{transform:translateX(0) skewX(0deg);opacity:1;}
+.overlay-accent{
+  position:absolute;top:0;left:0;
+  width:3px;height:100%;
+  background:linear-gradient(to bottom,transparent,var(--red) 20%,var(--red) 80%,transparent);
+  box-shadow:0 0 20px rgba(232,0,26,0.4);
+}
+.ov-back{
+  position:absolute;top:2rem;left:2.5rem;
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--red);cursor:none;
+  display:flex;align-items:center;gap:0.6rem;
+  border:1px solid rgba(232,0,26,0.35);padding:0.4rem 0.9rem;
+  transition:background 0.15s;
+}
+.ov-back:hover{background:rgba(232,0,26,0.1);}
+.ov-label{
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--red);margin-bottom:2.5rem;
+  display:flex;align-items:center;gap:1rem;padding:0 2.5rem;
+}
+.ov-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(232,0,26,0.5),transparent);}
+.sub-list{padding:0 2.5rem;}
+.sub-item{
+  position:relative;
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1.1rem 1.25rem;
+  border-bottom:1px solid rgba(242,236,224,0.05);
+  cursor:none;text-decoration:none;overflow:hidden;
+  transition:background 0.15s;
+}
+.sub-item:first-child{border-top:1px solid rgba(242,236,224,0.05);}
+.sub-item::before{
+  content:'';position:absolute;inset:0;
+  clip-path:polygon(0% 0%,97% 0%,100% 50%,97% 100%,0% 100%);
+  background:linear-gradient(90deg,rgba(232,0,26,0.15),transparent);
+  opacity:0;transform:translateX(-10px);
+  transition:opacity 0.15s,transform 0.15s cubic-bezier(0.23,1,0.32,1);
+}
+.sub-item:hover::before{opacity:1;transform:translateX(0);}
+.sub-n{font-size:0.55rem;color:rgba(232,0,26,0.4);font-family:Arial,sans-serif;width:1.5rem;flex-shrink:0;z-index:1;}
+.sub-info{flex:1;z-index:1;}
+.sub-name{
+  font-size:1.3rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:0.04em;
+  color:rgba(242,236,224,0.65);line-height:1;
+  transition:color 0.15s,text-shadow 0.15s;
+}
+.sub-item:hover .sub-name{
+  color:var(--white);
+  text-shadow:2px 2px 0 rgba(232,0,26,0.6),4px 4px 0 rgba(0,0,0,0.8);
+}
+.sub-desc{
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(242,236,224,0.22);margin-top:3px;
+}
+.sub-arr{z-index:1;font-size:0.9rem;color:rgba(232,0,26,0.35);transition:color 0.15s,transform 0.15s;}
+.sub-item:hover .sub-arr{color:var(--red);transform:translateX(4px);}
+
+/* COMING SOON */
+.cs-wrap{text-align:center;padding:0 2.5rem;}
+.cs-diamond{
+  width:60px;height:60px;border:2px solid rgba(232,0,26,0.55);
+  transform:rotate(45deg);margin:0 auto 2.5rem;
+  display:flex;align-items:center;justify-content:center;
+  animation:diam 3s ease-in-out infinite;
+}
+@keyframes diam{0%,100%{box-shadow:0 0 20px rgba(232,0,26,0.15);}50%{box-shadow:0 0 40px rgba(232,0,26,0.45);}}
+.cs-title{
+  font-size:3rem;font-weight:900;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.5),6px 6px 0 rgba(0,0,0,0.9);
+  margin-bottom:0.75rem;
+}
+.cs-sub{
+  font-family:Arial,sans-serif;font-size:0.65rem;
+  letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(242,236,224,0.22);margin-bottom:3rem;
+}
+.cs-bar{width:160px;height:2px;background:rgba(242,236,224,0.07);margin:0 auto;overflow:hidden;}
+.cs-fill{height:100%;background:var(--red);animation:prog 2s ease-in-out infinite alternate;box-shadow:0 0 8px var(--red);}
+@keyframes prog{from{width:20%;margin-left:0;}to{width:50%;margin-left:30%;}}
+
+#flash{
+  position:fixed;inset:0;z-index:700;
+  background:var(--red);opacity:0;pointer-events:none;
+  transition:opacity 0.07s;
+}
+#flash.on{opacity:0.4;}
+
+@media(max-width:768px){
+  .shell{grid-template-columns:1fr;}
+  .identity{display:none;}
+  .panel{padding:5rem 1.5rem 4rem;}
+  .mi-label{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="flash"></div>
+<div class="scan"></div>
+<div class="bg">
+  <canvas id="bgCanvas"></canvas>
+  <div class="hl hl1"></div>
+  <div class="hl hl2"></div>
+  <div class="hl hl3"></div>
+</div>
+
+<div class="shell">
+  <div class="identity">
+    <div class="id-slab"></div>
+    <div class="id-vert">Developer · Designer · Engineer</div>
+    <div class="id-year">Portfolio · 2025</div>
+    <div class="id-eyebrow">Creative Portfolio</div>
+    <div class="id-name">
+      <span class="first">Joshua</span>
+      <span class="last">Easo</span>
+    </div>
+    <div class="id-role">Developer · Designer · Engineer</div>
+    <div class="cut"></div>
+    <div class="cut-line"></div>
+  </div>
+
+  <div class="panel">
+    <div class="corner"></div>
+    <div class="panel-label">Select Category</div>
+    <ul class="menu" id="menu">
+      <li class="mi active" data-action="webdesign">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo0"></svg>
+        <span class="mi-num">01</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">Web Design</div><div class="mi-sub">Frontend · UI · Layout</div></div>
+        <span class="mi-tag">3 Works</span>
+      </li>
+      <li class="mi" data-action="cs">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo1"></svg>
+        <span class="mi-num">02</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">UX / UI Design</div><div class="mi-sub">Figma · Research · Systems</div></div>
+        <span class="mi-tag">Soon</span>
+      </li>
+      <li class="mi" data-action="cs">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo2"></svg>
+        <span class="mi-num">03</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">Game Design</div><div class="mi-sub">Unity · Unreal · C#</div></div>
+        <span class="mi-tag">Soon</span>
+      </li>
+      <li class="mi" data-action="cs">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo3"></svg>
+        <span class="mi-num">04</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">Coding</div><div class="mi-sub">Python · JS · SQL · C++</div></div>
+        <span class="mi-tag">Soon</span>
+      </li>
+      <li class="mi" data-action="cs">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo4"></svg>
+        <span class="mi-num">05</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">Media Arts</div><div class="mi-sub">Motion · VFX · Print</div></div>
+        <span class="mi-tag">Soon</span>
+      </li>
+      <li class="mi" data-action="linkedin">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo5"></svg>
+        <span class="mi-num">06</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">LinkedIn</div><div class="mi-sub">Connect · Hire · Network</div></div>
+        <span class="mi-tag">↗</span>
+      </li>
+      <li class="mi" data-action="github">
+        <div class="mi-frame"></div><div class="mi-bar"></div>
+        <svg class="mi-geo" id="geo6"></svg>
+        <span class="mi-num">07</span><div class="mi-arr"></div>
+        <div class="mi-text"><div class="mi-label">GitHub</div><div class="mi-sub">Code · Repos · Open Source</div></div>
+        <span class="mi-tag">↗</span>
+      </li>
+    </ul>
+    <div class="statusbar">
+      <div class="sb-hints">
+        <span><span class="sb-key">↑↓</span>Navigate</span>
+        <span><span class="sb-key">Enter</span>Select</span>
+        <span><span class="sb-key">Esc</span>Back</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEB DESIGN OVERLAY -->
+<div class="overlay" id="ovWeb">
+  <div class="overlay-accent"></div>
+  <div class="ov-back" id="webBack">← Back</div>
+  <div class="overlay-inner">
+    <div class="ov-label">Web Design — Select Project</div>
+    <div class="sub-list">
+      <a class="sub-item" href="aria-landing.html" target="_blank">
+        <span class="sub-n">01</span>
+        <div class="sub-info"><div class="sub-name">ARIA</div><div class="sub-desc">Product Landing Page · Futuristic Tech</div></div>
+        <span class="sub-arr">→</span>
+      </a>
+      <a class="sub-item" href="obsidian-restaurant.html" target="_blank">
+        <span class="sub-n">02</span>
+        <div class="sub-info"><div class="sub-name">OBSIDIAN</div><div class="sub-desc">Fine Dining Restaurant · Dark Luxury</div></div>
+        <span class="sub-arr">→</span>
+      </a>
+      <a class="sub-item" href="nova-agency.html" target="_blank">
+        <span class="sub-n">03</span>
+        <div class="sub-info"><div class="sub-name">NOVA Studio</div><div class="sub-desc">Creative Agency · Techy Futuristic</div></div>
+        <span class="sub-arr">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- COMING SOON OVERLAY -->
+<div class="overlay" id="ovCS">
+  <div class="overlay-accent"></div>
+  <div class="ov-back" id="csBack">← Back</div>
+  <div class="overlay-inner">
+    <div class="cs-wrap">
+      <div class="cs-diamond"></div>
+      <div class="cs-title">Coming Soon</div>
+      <div class="cs-sub">This section is under construction</div>
+      <div class="cs-bar"><div class="cs-fill"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cur=document.getElementById('cur');
+const flash=document.getElementById('flash');
+const items=Array.from(document.querySelectorAll('.mi'));
+let idx=0;
+
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';
+  cur.style.top=e.clientY+'px';
+});
+
+function setActive(i){
+  items.forEach(el=>el.classList.remove('active'));
+  items[i].classList.add('active');
+  idx=i;
+  geoSystem.onSelect(i);
+}
+
+items.forEach((el,i)=>el.addEventListener('mouseenter',()=>setActive(i)));
+
+document.addEventListener('keydown',e=>{
+  const anyOpen=document.querySelector('.overlay.open');
+  if(anyOpen){if(e.key==='Escape')closeAll();return;}
+  if(e.key==='ArrowDown'){e.preventDefault();setActive(Math.min(idx+1,items.length-1));}
+  if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(idx-1,0));}
+  if(e.key==='Enter'){e.preventDefault();trigger(items[idx].dataset.action);}
+});
+
+items.forEach(el=>el.addEventListener('click',()=>trigger(el.dataset.action)));
+
+function doFlash(cb){
+  flash.classList.add('on');
+  setTimeout(()=>{flash.classList.remove('on');if(cb)cb();},110);
+}
+
+function trigger(action){
+  doFlash(()=>{
+    if(action==='webdesign')document.getElementById('ovWeb').classList.add('open');
+    else if(action==='linkedin')window.open('https://www.linkedin.com/in/joshua-easo-81b1a7196','_blank');
+    else if(action==='github')window.open('https://github.com/GoshDaKirby','_blank');
+    else document.getElementById('ovCS').classList.add('open');
+  });
+}
+
+function closeAll(){
+  doFlash(()=>{
+    document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
+  });
+}
+
+document.getElementById('webBack').addEventListener('click',closeAll);
+document.getElementById('csBack').addEventListener('click',closeAll);
+
+/* ── GEOMETRY SYSTEM ── */
+const geoSystem = (() => {
+  // Colors: black, white, red, light blue
+  const FILLS = [
+    'rgba(0,0,0,0.75)',
+    'rgba(242,236,224,0.12)',
+    'rgba(232,0,26,0.45)',
+    'rgba(120,210,255,0.25)',
+    'rgba(0,0,0,0.5)',
+    'rgba(232,0,26,0.2)',
+    'rgba(120,210,255,0.15)',
+    'rgba(242,236,224,0.07)',
+  ];
+
+  // Each item gets its own set of shapes
+  const itemStates = items.map((el, i) => {
+    const svg = el.querySelector('.mi-geo');
+    return { svg, shapes: [], animating: false, slowSpeed: 0.18, fastSpeed: 3.2 };
+  });
+
+  // Build shapes for a given svg element (called lazily on first activate)
+  function initShapes(state) {
+    if (state.shapes.length) return;
+    const svg = state.svg;
+    // We'll use the svg's bounding area — get it after layout
+    const rect = svg.parentElement.getBoundingClientRect();
+    const W = rect.width || 460;
+    const H = rect.height || 62;
+
+    // Safe zones: shapes live in margins around the text
+    // Left margin: 0 to ~48px (num + arr area)
+    // Right margin: last ~50px (tag area)
+    // Top/bottom: 4px inner padding
+    // We create shapes in two zones: left strip and right strip
+    const zones = [
+      // left strip (between bar and num)
+      { xMin: 4, xMax: 46, yMin: 6, yMax: H - 6 },
+      // right strip (after tag)
+      { xMin: W - 46, xMax: W - 4, yMin: 6, yMax: H - 6 },
+      // very top sliver across full width
+      { xMin: 48, xMax: W - 52, yMin: 4, yMax: 14 },
+      // very bottom sliver
+      { xMin: 48, xMax: W - 52, yMin: H - 14, yMax: H - 4 },
+    ];
+
+    const shapeCount = 7;
+    const shapes = [];
+
+    for (let s = 0; s < shapeCount; s++) {
+      const zone = zones[s % zones.length];
+      const cx = zone.xMin + Math.random() * (zone.xMax - zone.xMin);
+      const cy = zone.yMin + Math.random() * (zone.yMax - zone.yMin);
+      // small polygons — 3 or 4 vertices
+      const sides = Math.random() < 0.5 ? 3 : 4;
+      const size = 4 + Math.random() * 9; // 4–13px
+      const fillIdx = Math.floor(Math.random() * FILLS.length);
+
+      // Generate vertices around center, clamped to zone
+      const verts = [];
+      for (let v = 0; v < sides; v++) {
+        const angle = (v / sides) * Math.PI * 2 + Math.random() * 0.6;
+        const r = size * (0.5 + Math.random() * 0.5);
+        const vx = Math.max(zone.xMin, Math.min(zone.xMax, cx + Math.cos(angle) * r));
+        const vy = Math.max(zone.yMin, Math.min(zone.yMax, cy + Math.sin(angle) * r));
+        verts.push({
+          x: vx, y: vy,
+          // target (drifts toward)
+          tx: vx, ty: vy,
+          // home zone for this vertex
+          zone,
+          // drift range: vertex can move ±range from its initial pos
+          range: 5 + Math.random() * 6,
+          ox: vx, oy: vy, // original center
+        });
+      }
+
+      const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      poly.setAttribute('fill', FILLS[fillIdx]);
+      poly.setAttribute('stroke', 'none');
+      svg.appendChild(poly);
+
+      shapes.push({ poly, verts, fillIdx });
+    }
+
+    // Set svg viewBox to match item size
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    state.shapes = shapes;
+    state.W = W;
+    state.H = H;
+  }
+
+  function updatePolygon(shape) {
+    const pts = shape.verts.map(v => `${v.x.toFixed(2)},${v.y.toFixed(2)}`).join(' ');
+    shape.poly.setAttribute('points', pts);
+  }
+
+  // Set new random targets for all vertices
+  function randomizeTargets(state, speed) {
+    state.shapes.forEach(shape => {
+      shape.verts.forEach(v => {
+        const z = v.zone;
+        // new target near origin but within range, clamped to zone
+        v.tx = Math.max(z.xMin, Math.min(z.xMax, v.ox + (Math.random() - 0.5) * 2 * v.range));
+        v.ty = Math.max(z.yMin, Math.min(z.yMax, v.oy + (Math.random() - 0.5) * 2 * v.range));
+      });
+    });
+    state.currentSpeed = speed;
+  }
+
+  // Lerp all vertices toward their targets; returns true if still moving
+  function lerpShapes(state) {
+    const spd = state.currentSpeed || state.slowSpeed;
+    let moving = false;
+    state.shapes.forEach(shape => {
+      shape.verts.forEach(v => {
+        const dx = v.tx - v.x;
+        const dy = v.ty - v.y;
+        if (Math.abs(dx) > 0.05 || Math.abs(dy) > 0.05) {
+          v.x += dx * spd * 0.1;
+          v.y += dy * spd * 0.1;
+          moving = true;
+        } else {
+          v.x = v.tx; v.y = v.ty;
+        }
+      });
+      updatePolygon(shape);
+    });
+    return moving;
+  }
+
+  let rafId = null;
+  let slowDriftTimer = null;
+
+  function startLoop() {
+    if (rafId) return;
+    function loop() {
+      const state = itemStates[idx];
+      if (!state || !state.shapes.length) { rafId = null; return; }
+      const moving = lerpShapes(state);
+      rafId = requestAnimationFrame(loop);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function stopLoop() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function scheduleSlow(state) {
+    if (slowDriftTimer) clearInterval(slowDriftTimer);
+    // Every 2.5s pick new gentle targets
+    slowDriftTimer = setInterval(() => {
+      if (itemStates[idx] === state) {
+        randomizeTargets(state, state.slowSpeed);
+      }
+    }, 2500);
+  }
+
+  function onSelect(i) {
+    // Stop any slow drift timer
+    if (slowDriftTimer) clearInterval(slowDriftTimer);
+    stopLoop();
+
+    const state = itemStates[i];
+    initShapes(state);
+
+    // Fast burst to new positions
+    randomizeTargets(state, state.fastSpeed);
+    startLoop();
+
+    // After ~600ms, slow down and schedule gentle drift
+    setTimeout(() => {
+      if (itemStates[idx] === state) {
+        state.currentSpeed = state.slowSpeed;
+        scheduleSlow(state);
+      }
+    }, 600);
+  }
+
+  // Kick off initial state
+  setTimeout(() => onSelect(0), 100);
+
+  return { onSelect };
+})();
+/* ── BACKGROUND CANVAS ── */
+(()=>{
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ── STREAKS OF LIGHT ──
+  const streaks = Array.from({length:18}, ()=>makeStreak());
+
+  function makeStreak(){
+    const angle = (-15 + Math.random()*8) * Math.PI/180; // nearly horizontal, slight negative tilt
+    const speed = 0.08 + Math.random()*0.18;
+    const len   = 60 + Math.random()*200;
+    const alpha = 0.025 + Math.random()*0.045;
+    const w     = 0.4 + Math.random()*0.8;
+    return {
+      x: Math.random()*1.6*window.innerWidth - 0.3*window.innerWidth,
+      y: Math.random()*window.innerHeight,
+      angle, speed, len, alpha, w,
+      // color: mostly white, occasional red or cyan
+      color: Math.random()<0.75
+        ? `rgba(242,236,224,${alpha})`
+        : Math.random()<0.5
+          ? `rgba(232,0,26,${alpha*0.8})`
+          : `rgba(100,200,255,${alpha*0.7})`,
+    };
+  }
+
+  function updateStreak(s){
+    s.x += Math.cos(s.angle) * s.speed;
+    s.y += Math.sin(s.angle) * s.speed;
+    // wrap when fully off-screen to the right/bottom
+    if(s.x > W+400) s.x = -400;
+    if(s.y > H+40)  s.y = -40;
+    if(s.x < -400)  s.x = W+400;
+  }
+
+  function drawStreak(s){
+    const ex = s.x + Math.cos(s.angle)*s.len;
+    const ey = s.y + Math.sin(s.angle)*s.len;
+    const g = ctx.createLinearGradient(s.x,s.y,ex,ey);
+    g.addColorStop(0,'transparent');
+    g.addColorStop(0.4,s.color);
+    g.addColorStop(1,'transparent');
+    ctx.beginPath();
+    ctx.moveTo(s.x,s.y);
+    ctx.lineTo(ex,ey);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = s.w;
+    ctx.stroke();
+  }
+
+  // ── FLOATING GEOMETRY ──
+  // Small dim triangles/quads drifting slowly
+  const geos = Array.from({length:22}, ()=>makeGeo());
+
+  function makeGeo(){
+    const sides  = Math.random()<0.5 ? 3 : 4;
+    const size   = 6 + Math.random()*22;
+    const alpha  = 0.015 + Math.random()*0.04;
+    const filled = Math.random()<0.3; // mostly just strokes
+    const speed  = {
+      x: (Math.random()-0.5)*0.12,
+      y: (Math.random()-0.5)*0.08,
+      r: (Math.random()-0.5)*0.003,
+    };
+    const col = Math.random()<0.6
+      ? `rgba(242,236,224,${alpha})`
+      : Math.random()<0.5
+        ? `rgba(232,0,26,${alpha})`
+        : `rgba(100,200,255,${alpha})`;
+    return {
+      x: Math.random()*window.innerWidth,
+      y: Math.random()*window.innerHeight,
+      size, sides, filled, speed, col,
+      rot: Math.random()*Math.PI*2,
+    };
+  }
+
+  function updateGeo(g){
+    g.x   += g.speed.x;
+    g.y   += g.speed.y;
+    g.rot += g.speed.r;
+    if(g.x < -60)   g.x = W+60;
+    if(g.x > W+60)  g.x = -60;
+    if(g.y < -60)   g.y = H+60;
+    if(g.y > H+60)  g.y = -60;
+  }
+
+  function drawGeo(g){
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.rot);
+    ctx.beginPath();
+    for(let i=0;i<g.sides;i++){
+      const a = (i/g.sides)*Math.PI*2;
+      const px = Math.cos(a)*g.size;
+      const py = Math.sin(a)*g.size;
+      i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    if(g.filled){
+      ctx.fillStyle = g.col;
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = g.col;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── RENDER LOOP ──
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+
+    // Draw streaks
+    streaks.forEach(s=>{ updateStreak(s); drawStreak(s); });
+
+    // Draw geometry
+    geos.forEach(g=>{ updateGeo(g); drawGeo(g); });
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

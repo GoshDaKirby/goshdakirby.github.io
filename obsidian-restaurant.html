@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBSIDIAN — Fine Dining</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #07060a;
+    --surface: #100f14;
+    --surface2: #17151e;
+    --border: rgba(200,170,120,0.15);
+    --gold: #c8a96e;
+    --gold2: #e8c98a;
+    --text: #ede8e0;
+    --muted: #7a7268;
+    --cream: #f5f0e8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: rgba(7,6,10,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-size: 1.4rem; letter-spacing: 0.3em; color: var(--gold);
+    font-weight: 400;
+  }
+  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-reserve {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.6rem 1.5rem; border: 1px solid var(--gold);
+    color: var(--gold); background: transparent; cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-reserve:hover { background: var(--gold); color: var(--bg); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 8rem 2rem 6rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 30%, rgba(200,169,110,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(200,169,110,0.04) 0%, transparent 60%);
+  }
+  .hero-line {
+    width: 1px; height: 80px; background: linear-gradient(to bottom, transparent, var(--gold));
+    margin: 0 auto 2.5rem;
+  }
+  .hero-eyebrow {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.5rem;
+  }
+  h1 {
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 400; letter-spacing: 0.08em;
+    color: var(--cream); margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+  .hero-sub-title {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 2rem; font-weight: 400;
+  }
+  .hero-desc {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--muted); font-size: 0.95rem; max-width: 480px;
+    margin: 0 auto 3rem; line-height: 1.8;
+  }
+  .hero-actions { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+  .btn-gold {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.9rem 2.5rem; background: var(--gold); color: var(--bg);
+    border: none; cursor: pointer; transition: opacity 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-gold:hover { opacity: 0.85; }
+  .btn-outline {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.9rem 2.5rem; border: 1px solid var(--border); color: var(--muted);
+    background: transparent; cursor: pointer; transition: border-color 0.3s, color 0.3s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .hero-line-bottom {
+    width: 1px; height: 80px; background: linear-gradient(to bottom, var(--gold), transparent);
+    margin: 3rem auto 0;
+  }
+
+  /* DIVIDER */
+  .ornament {
+    text-align: center; color: var(--gold); font-size: 1.2rem; letter-spacing: 1rem;
+    padding: 1rem; opacity: 0.5;
+  }
+
+  /* PHILOSOPHY */
+  .philosophy {
+    max-width: 700px; margin: 6rem auto; padding: 0 2rem; text-align: center;
+  }
+  .philosophy .label {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 2rem; display: block;
+  }
+  .philosophy blockquote {
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    color: var(--cream); font-weight: 400; line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+  .philosophy cite {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em;
+    font-style: normal;
+  }
+
+  /* MENU */
+  .menu-section { padding: 6rem 2rem; border-top: 1px solid var(--border); }
+  .menu-inner { max-width: 900px; margin: 0 auto; }
+  .menu-header { text-align: center; margin-bottom: 4rem; }
+  .menu-header .label {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem; display: block;
+  }
+  .menu-header h2 { font-size: 2.5rem; font-weight: 400; letter-spacing: 0.05em; color: var(--cream); }
+
+  .menu-category { margin-bottom: 4rem; }
+  .menu-cat-title {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+  .menu-cat-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .menu-item {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 1.25rem 0; border-bottom: 1px solid rgba(200,170,120,0.08);
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item-left { flex: 1; padding-right: 2rem; }
+  .menu-item-name { font-size: 1.05rem; color: var(--cream); margin-bottom: 0.25rem; }
+  .menu-item-desc {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.82rem; color: var(--muted); font-style: italic;
+  }
+  .menu-price {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.9rem; color: var(--gold); letter-spacing: 0.05em; white-space: nowrap;
+  }
+
+  /* EXPERIENCE */
+  .experience { padding: 6rem 2rem; border-top: 1px solid var(--border); }
+  .exp-inner { max-width: 1000px; margin: 0 auto; }
+  .exp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-top: 4rem; }
+  .exp-card {
+    padding: 2.5rem 2rem; background: var(--surface);
+    border: 1px solid var(--border);
+    transition: border-color 0.3s;
+  }
+  .exp-card:hover { border-color: rgba(200,170,120,0.4); }
+  .exp-number {
+    font-size: 0.7rem; letter-spacing: 0.2em;
+    color: var(--gold); margin-bottom: 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .exp-card h3 { font-size: 1.2rem; font-weight: 400; color: var(--cream); margin-bottom: 0.75rem; }
+  .exp-card p { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
+
+  /* RESERVATION */
+  .reservation {
+    padding: 8rem 2rem; text-align: center;
+    border-top: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(200,169,110,0.05) 0%, transparent 70%);
+  }
+  .reservation .label {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 2rem; display: block;
+  }
+  .reservation h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 400; color: var(--cream); margin-bottom: 1rem; letter-spacing: 0.05em; }
+  .reservation p { font-family: 'Segoe UI', system-ui, sans-serif; color: var(--muted); margin-bottom: 3rem; }
+  .res-form { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; max-width: 600px; margin: 0 auto; }
+  .res-form input, .res-form select {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 0.85rem 1.25rem; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text);
+    font-size: 0.875rem; flex: 1; min-width: 160px;
+    outline: none; transition: border-color 0.3s;
+  }
+  .res-form input:focus, .res-form select:focus { border-color: var(--gold); }
+  .res-form select option { background: var(--surface); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border); padding: 3rem 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1.5rem;
+  }
+  .footer-logo { font-size: 1.1rem; letter-spacing: 0.3em; color: var(--gold); }
+  .footer-info { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 0.8rem; color: var(--muted); text-align: center; }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-links a {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--muted); font-size: 0.78rem; text-decoration: none;
+    letter-spacing: 0.1em; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">OBSIDIAN</div>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#reserve">Reserve</a></li>
+  </ul>
+  <button class="nav-reserve">Reserve a Table</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-eyebrow">Chicago · Est. 2019</div>
+  <h1>OBSIDIAN</h1>
+  <div class="hero-sub-title">A Study in Contrast</div>
+  <p class="hero-desc">Twelve courses. One philosophy. The most elemental ingredients on earth, prepared with the precision of a science and the soul of an art.</p>
+  <div class="hero-actions">
+    <a href="#reserve" class="btn-gold">Reserve Your Evening</a>
+    <a href="#menu" class="btn-outline">View the Menu</a>
+  </div>
+  <div class="hero-line-bottom"></div>
+</section>
+
+<div class="ornament">· · ·</div>
+
+<div class="philosophy">
+  <span class="label">Our Philosophy</span>
+  <blockquote>"We do not cook food. We reveal what it already is."</blockquote>
+  <cite>— Chef Maren Holst, Executive Chef & Co-founder</cite>
+</div>
+
+<section class="menu-section" id="menu">
+  <div class="menu-inner">
+    <div class="menu-header">
+      <span class="label">Tasting Menu</span>
+      <h2>Autumn Collection</h2>
+    </div>
+
+    <div class="menu-category">
+      <div class="menu-cat-title">Prelude</div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Stone & Salt</div>
+          <div class="menu-item-desc">Cured sea urchin, black sesame, salted koji cream, micro shiso</div>
+        </div>
+        <div class="menu-price">—</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Ember Bread</div>
+          <div class="menu-item-desc">Charcoal-leavened brioche, cultured butter, smoked salt fleur</div>
+        </div>
+        <div class="menu-price">—</div>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <div class="menu-cat-title">First Movement</div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">The River</div>
+          <div class="menu-item-desc">Wild salmon crudo, yuzu gelée, compressed cucumber, dill oil, frozen horseradish</div>
+        </div>
+        <div class="menu-price">$48</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Beneath the Soil</div>
+          <div class="menu-item-desc">Roasted beet terrine, goat curd, hazelnut dust, aged sherry reduction</div>
+        </div>
+        <div class="menu-price">$42</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">The Forest Floor</div>
+          <div class="menu-item-desc">Aged matsutake, truffle foam, pine oil, preserved lemon, black garlic</div>
+        </div>
+        <div class="menu-price">$58</div>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <div class="menu-cat-title">Second Movement</div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Côte de Boeuf, Obsidian</div>
+          <div class="menu-item-desc">45-day dry-aged wagyu, bone marrow jus, black truffle, confit shallot, pickled elderberry</div>
+        </div>
+        <div class="menu-price">$145</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">The Whole Duck</div>
+          <div class="menu-item-desc">Two-day lacquered Peking-style duck, fermented plum, szechuan oil, spring onion, mandarin</div>
+        </div>
+        <div class="menu-price">$98</div>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <div class="menu-cat-title">Finale</div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Dark Matter</div>
+          <div class="menu-item-desc">72% Valrhona chocolate, activated charcoal tuile, salted caramel, smoked vanilla</div>
+        </div>
+        <div class="menu-price">$28</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">Light & Stone</div>
+          <div class="menu-item-desc">Yuzu sorbet, compressed honeydew, champagne granite, edible gold leaf</div>
+        </div>
+        <div class="menu-price">$24</div>
+      </div>
+    </div>
+
+    <p style="font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 2rem;">
+      Full tasting menu (12 courses) $285 per person · Wine pairing $180 · Non-alcoholic pairing $95
+    </p>
+  </div>
+</section>
+
+<section class="experience" id="experience">
+  <div class="exp-inner">
+    <div style="text-align:center;">
+      <span style="font-family: 'Segoe UI', system-ui, sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 1rem;">The Evening</span>
+      <h2 style="font-size: 2.5rem; font-weight: 400; color: var(--cream); letter-spacing: 0.05em;">More than a meal</h2>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-card">
+        <div class="exp-number">01</div>
+        <h3>The Room</h3>
+        <p>Forty seats. Three seatings per evening. Designed by Studio Koto as a space where darkness becomes texture and silence becomes presence.</p>
+      </div>
+      <div class="exp-card">
+        <div class="exp-number">02</div>
+        <h3>The Kitchen</h3>
+        <p>An open kitchen at the heart of the dining room. Watch the team work in the same light you eat in. No curtain. No division.</p>
+      </div>
+      <div class="exp-card">
+        <div class="exp-number">03</div>
+        <h3>The Cellar</h3>
+        <p>2,400 labels selected by sommelier Ikaika Nakoa, with a focus on small producers, natural ferments, and wines that have something to say.</p>
+      </div>
+      <div class="exp-card">
+        <div class="exp-number">04</div>
+        <h3>Private Dining</h3>
+        <p>The Vault seats up to twelve for exclusive tastings, custom menus, and private celebrations. Inquire for availability and pricing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reservation" id="reserve">
+  <span class="label">Make a Reservation</span>
+  <h2>Join us this evening</h2>
+  <p>Reservations open 60 days in advance. Cancellations must be made 48 hours prior.</p>
+  <div class="res-form">
+    <input type="text" placeholder="Your name">
+    <input type="email" placeholder="Email address">
+    <input type="date">
+    <select>
+      <option>2 guests</option>
+      <option>3 guests</option>
+      <option>4 guests</option>
+      <option>6 guests</option>
+      <option>Private dining</option>
+    </select>
+    <button class="btn-gold" style="width: 100%; padding: 0.9rem;">Request Reservation</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">OBSIDIAN</div>
+  <div class="footer-info">
+    141 W Kinzie St, Chicago, IL 60654<br>
+    +1 (312) 555 0190 · hello@obsidianchicago.com
+  </div>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Press</a>
+    <a href="#">Gift Cards</a>
+  </div>
+</footer>
+
+</body>
+</html>

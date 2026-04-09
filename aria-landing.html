@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Neural Audio Interface</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050810;
+    --surface: #0d1117;
+    --surface2: #141a24;
+    --border: rgba(99,179,255,0.15);
+    --accent: #4fa3ff;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --text: #e8edf5;
+    --muted: #7a8ba0;
+    --glow: rgba(79,163,255,0.25);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    background: rgba(5,8,16,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-size: 1.3rem; font-weight: 700; letter-spacing: 0.15em;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 0.875rem;
+    letter-spacing: 0.05em; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    padding: 0.5rem 1.25rem; border-radius: 6px;
+    border: 1px solid var(--accent); color: var(--accent);
+    background: transparent; font-size: 0.875rem; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover { background: rgba(79,163,255,0.1); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8rem 2rem 4rem;
+    position: relative; text-align: center;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,163,255,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -60%);
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%);
+    top: 60%; left: 60%;
+    pointer-events: none;
+  }
+  .eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .eyebrow::before, .eyebrow::after {
+    content: ''; display: block; width: 2rem; height: 1px; background: var(--accent);
+  }
+  h1 {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 800; line-height: 1.05;
+    letter-spacing: -0.03em; margin-bottom: 1.5rem;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 1.15rem; color: var(--muted); max-width: 520px;
+    margin: 0 auto 2.5rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 0.85rem 2rem; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 0.95rem; font-weight: 600;
+    border: none; cursor: pointer; transition: opacity 0.2s, transform 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-ghost {
+    padding: 0.85rem 2rem; border-radius: 8px;
+    border: 1px solid var(--border); color: var(--text);
+    background: transparent; font-size: 0.95rem; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(79,163,255,0.05); }
+
+  /* DEVICE VISUAL */
+  .device-container {
+    margin: 5rem auto 0; position: relative; width: 340px; height: 340px;
+  }
+  .device-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid;
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+  .ring1 { inset: 0; border-color: rgba(79,163,255,0.3); }
+  .ring2 { inset: 20px; border-color: rgba(167,139,250,0.2); animation-delay: 0.5s; }
+  .ring3 { inset: 40px; border-color: rgba(52,211,153,0.15); animation-delay: 1s; }
+  @keyframes pulse-ring {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+  .device-core {
+    position: absolute; inset: 80px;
+    background: linear-gradient(135deg, #1a2535, #0d1525);
+    border-radius: 50%;
+    border: 1px solid rgba(79,163,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 60px rgba(79,163,255,0.2), inset 0 0 30px rgba(79,163,255,0.1);
+  }
+  .device-inner {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0.9;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(79,163,255,0.5); }
+    50% { box-shadow: 0 0 40px rgba(79,163,255,0.8), 0 0 60px rgba(167,139,250,0.4); }
+  }
+  .device-dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 10px var(--accent3);
+    animation: orbit 4s linear infinite;
+  }
+  @keyframes orbit {
+    from { transform: rotate(0deg) translateX(140px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(140px) rotate(-360deg); }
+  }
+  .device-dot2 {
+    position: absolute; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+    animation: orbit2 6s linear infinite;
+  }
+  @keyframes orbit2 {
+    from { transform: rotate(120deg) translateX(110px) rotate(-120deg); }
+    to { transform: rotate(480deg) translateX(110px) rotate(-480deg); }
+  }
+
+  /* STATS BAR */
+  .stats {
+    display: flex; justify-content: center; gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 6rem 0;
+  }
+  .stat {
+    flex: 1; max-width: 200px; padding: 2rem 1rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; letter-spacing: 0.05em; }
+
+  /* FEATURES */
+  .section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .section-sub { color: var(--muted); max-width: 500px; margin-bottom: 4rem; }
+
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .feature {
+    background: var(--surface); padding: 2rem;
+    transition: background 0.2s;
+  }
+  .feature:hover { background: var(--surface2); }
+  .feature-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem; font-size: 1.2rem;
+  }
+  .icon-blue { background: rgba(79,163,255,0.15); border: 1px solid rgba(79,163,255,0.3); }
+  .icon-purple { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); }
+  .icon-green { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); }
+  .feature h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .feature p { color: var(--muted); font-size: 0.875rem; line-height: 1.7; }
+
+  /* SPECS */
+  .specs-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-top: 3rem;
+  }
+  .spec-row {
+    background: var(--surface); padding: 1.25rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .spec-row:hover { background: var(--surface2); }
+  .spec-key { font-size: 0.875rem; color: var(--muted); }
+  .spec-val { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem; margin-top: 3rem;
+  }
+  .pricing-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem; position: relative;
+    transition: border-color 0.2s;
+  }
+  .pricing-card:hover { border-color: rgba(79,163,255,0.4); }
+  .pricing-card.featured {
+    border-color: rgba(79,163,255,0.6);
+    background: linear-gradient(135deg, rgba(79,163,255,0.05), rgba(167,139,250,0.05));
+  }
+  .badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 0.7rem; font-weight: 700;
+    padding: 0.25rem 0.75rem; border-radius: 20px; letter-spacing: 0.1em;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .plan-name { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .plan-price { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+  .plan-price span { font-size: 1rem; font-weight: 400; color: var(--muted); }
+  .plan-desc { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .plan-features li { font-size: 0.875rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+  .check { color: var(--accent3); font-weight: 700; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; max-width: 1100px; margin: 0 auto;
+  }
+  .footer-logo {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: 0.15em;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-links a { color: var(--muted); font-size: 0.875rem; text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-copy { color: var(--muted); font-size: 0.8rem; width: 100%; text-align: center; margin-top: 1rem; }
+
+  /* WAVE DIVIDER */
+  .wave { opacity: 0.3; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .stats { flex-wrap: wrap; }
+    .stat { min-width: 140px; }
+    .specs-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ARIA</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#specs">Specs</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <button class="nav-cta">Pre-order</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="eyebrow">Neural Audio Interface</div>
+  <h1>Sound that<br><span class="gradient-text">thinks with you</span></h1>
+  <p class="hero-sub">ARIA learns your auditory preferences in real time, adapting to your environment, mood, and focus state using on-device AI — no cloud required.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">Pre-order — $299</a>
+    <a href="#features" class="btn-ghost">See how it works</a>
+  </div>
+  <div class="device-container">
+    <div class="device-ring ring1"></div>
+    <div class="device-ring ring2"></div>
+    <div class="device-ring ring3"></div>
+    <div class="device-core">
+      <div class="device-inner"></div>
+    </div>
+    <div class="device-dot"></div>
+    <div class="device-dot2"></div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">48h</div>
+    <div class="stat-label">Battery life</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0ms</div>
+    <div class="stat-label">Perceived latency</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">6-axis</div>
+    <div class="stat-label">Neural tracking</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">IP68</div>
+    <div class="stat-label">Water resistant</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">40dB</div>
+    <div class="stat-label">ANC depth</div>
+  </div>
+</div>
+
+<section class="section" id="features">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title">Engineered for the <span class="gradient-text">human mind</span></h2>
+  <p class="section-sub">Six years of neuroscience research condensed into 4.7 grams of hardware.</p>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon icon-blue">⚡</div>
+      <h3>Neural Adaptation Engine</h3>
+      <p>On-device AI analyzes 200+ acoustic parameters per second, continuously reshaping your soundstage without any perceptible interruption.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-purple">◈</div>
+      <h3>Focus Mode</h3>
+      <p>Biometric sensors detect cognitive load and automatically attenuate distracting frequencies while preserving conversational speech clarity.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-green">◉</div>
+      <h3>Spatial Audio 3.0</h3>
+      <p>Head-tracking at 1000Hz enables millimeter-precise audio anchoring. Sound sources stay locked in physical space, not to your head.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-blue">⬡</div>
+      <h3>Zero-Latency Passthrough</h3>
+      <p>Transparency mode operates at 0.1ms — below human perception threshold. The world sounds like glass isn't there.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-purple">✦</div>
+      <h3>Voice Intelligence</h3>
+      <p>Directional beamforming isolates your voice from up to 40dB of ambient noise. Crystal clear calls on a construction site.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-green">⬟</div>
+      <h3>Privacy-first AI</h3>
+      <p>All inference runs locally on the ARIA Neural Chip. No audio leaves your ears. No subscriptions. No servers listening.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="specs">
+  <div class="section-label">Technical</div>
+  <h2 class="section-title">Built to spec</h2>
+  <p class="section-sub">No marketing numbers. Every figure is third-party verified.</p>
+  <div class="specs-grid">
+    <div class="spec-row"><span class="spec-key">Processor</span><span class="spec-val">ARIA NC-1 (4nm)</span></div>
+    <div class="spec-row"><span class="spec-key">Driver size</span><span class="spec-val">11mm dynamic + BA</span></div>
+    <div class="spec-row"><span class="spec-key">Frequency response</span><span class="spec-val">5Hz – 40kHz</span></div>
+    <div class="spec-row"><span class="spec-key">ANC depth</span><span class="spec-val">−40dB</span></div>
+    <div class="spec-row"><span class="spec-key">Latency (gaming)</span><span class="spec-val">18ms</span></div>
+    <div class="spec-row"><span class="spec-key">Connectivity</span><span class="spec-val">BT 5.4 + LE Audio</span></div>
+    <div class="spec-row"><span class="spec-key">Battery (buds)</span><span class="spec-val">12 hours</span></div>
+    <div class="spec-row"><span class="spec-key">Battery (case)</span><span class="spec-val">36 hours additional</span></div>
+    <div class="spec-row"><span class="spec-key">Weight per bud</span><span class="spec-val">4.7g</span></div>
+    <div class="spec-row"><span class="spec-key">Water resistance</span><span class="spec-val">IP68 (1.5m / 30min)</span></div>
+    <div class="spec-row"><span class="spec-key">Microphones</span><span class="spec-val">4 per bud (8 total)</span></div>
+    <div class="spec-row"><span class="spec-key">Charging</span><span class="spec-val">USB-C + Qi wireless</span></div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Choose your ARIA</h2>
+  <p class="section-sub">Free shipping. 60-day returns. 2-year warranty on all models.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Standard</div>
+      <div class="plan-price">$229<span> USD</span></div>
+      <div class="plan-desc">Everything you need to hear the world differently.</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Neural Adaptation Engine</li>
+        <li><span class="check">✓</span> 40dB ANC</li>
+        <li><span class="check">✓</span> 48h total battery</li>
+        <li><span class="check">✓</span> IP68 rating</li>
+        <li><span class="check">✓</span> 2-year warranty</li>
+      </ul>
+      <a href="#" class="btn-ghost" style="display:block; text-align:center; padding: 0.75rem;">Pre-order Standard</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="badge">Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$299<span> USD</span></div>
+      <div class="plan-desc">For professionals who demand perfection in every environment.</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Everything in Standard</li>
+        <li><span class="check">✓</span> Focus Mode + biometrics</li>
+        <li><span class="check">✓</span> Spatial Audio 3.0</li>
+        <li><span class="check">✓</span> Gaming mode (18ms)</li>
+        <li><span class="check">✓</span> Priority support</li>
+      </ul>
+      <a href="#" class="btn-primary" style="display:block; text-align:center; padding: 0.75rem;">Pre-order Pro</a>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Studio</div>
+      <div class="plan-price">$449<span> USD</span></div>
+      <div class="plan-desc">Reference-grade audio for recording artists and producers.</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Everything in Pro</li>
+        <li><span class="check">✓</span> 5Hz–40kHz response</li>
+        <li><span class="check">✓</span> Lossless audio support</li>
+        <li><span class="check">✓</span> Custom EQ profiles</li>
+        <li><span class="check">✓</span> Lifetime warranty</li>
+      </ul>
+      <a href="#" class="btn-ghost" style="display:block; text-align:center; padding: 0.75rem;">Pre-order Studio</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">ARIA</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Support</a>
+    <a href="#">Press</a>
+  </div>
+  <div class="footer-copy">© 2025 ARIA Technologies, Inc. — Designed by Joshua Easo</div>
+</footer>
+
+</body>
+</html>
