@@ -428,12 +428,12 @@ html,body{
         <div class="mi-text"><div class="mi-label">Coding</div><div class="mi-sub">Python · JS · SQL · C++</div></div>
         <span class="mi-tag">Soon</span>
       </li>
-      <li class="mi" data-action="cs">
+      <li class="mi" data-action="mediaarts">
         <div class="mi-frame"></div><div class="mi-bar"></div>
         <svg class="mi-geo" id="geo4"></svg>
         <span class="mi-num">05</span><div class="mi-arr"></div>
         <div class="mi-text"><div class="mi-label">Media Arts</div><div class="mi-sub">Motion · VFX · Print</div></div>
-        <span class="mi-tag">Soon</span>
+        <span class="mi-tag">Live</span>
       </li>
       <li class="mi" data-action="linkedin">
         <div class="mi-frame"></div><div class="mi-bar"></div>
@@ -540,6 +540,7 @@ function trigger(action){
     if(action==='webdesign')document.getElementById('ovWeb').classList.add('open');
     else if(action==='linkedin')window.open('https://www.linkedin.com/in/joshua-easo-81b1a7196','_blank');
     else if(action==='github')window.open('https://github.com/GoshDaKirby','_blank');
+    else if(action==='mediaarts')window.location.href='media-arts.html';
     else document.getElementById('ovCS').classList.add('open');
   });
 }
@@ -881,6 +882,9 @@ const geoSystem = (() => {
   }
   requestAnimationFrame(frame);
 })();
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
