@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Arts — Joshua Easo</title>
+<link rel="icon" type="image/png" href="GDK.png">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --red:#e8001a;
+  --black:#080808;
+  --white:#f2ece0;
+  --surface:#0f0f0f;
+  --border:rgba(242,236,224,0.06);
+}
+
+html,body{
+  width:100%;min-height:100%;
+  background:var(--black);
+  font-family:'Arial Black','Arial Bold',Arial,sans-serif;
+  cursor:none;
+  user-select:none;
+  overflow-x:hidden;
+}
+
+#cur{
+  position:fixed;z-index:9999;pointer-events:none;
+  width:10px;height:10px;
+  background:var(--red);
+  transform:translate(-50%,-50%) rotate(45deg);
+  box-shadow:0 0 8px var(--red);
+}
+
+.scan{
+  position:fixed;inset:0;z-index:800;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
+}
+
+/* BG */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;}
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.bg::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(-55deg,transparent 0,transparent 38px,rgba(255,255,255,0.018) 38px,rgba(255,255,255,0.018) 39px);
+}
+.bg::after{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(0,0,0,0.75) 100%);
+}
+.hl{position:absolute;left:-5%;width:110%;height:1px;background:var(--red);z-index:3;}
+.hl1{top:6%;transform:rotate(-2deg);opacity:0.4;box-shadow:0 0 12px var(--red);}
+.hl2{top:6.4%;transform:rotate(-2deg);opacity:0.12;}
+
+/* MAIN LAYOUT */
+.page{position:relative;z-index:100;min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV BAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  height:56px;
+  background:rgba(8,8,8,0.95);
+  border-bottom:1px solid rgba(232,0,26,0.15);
+  display:flex;align-items:center;
+  padding:0 2.5rem;
+  gap:2rem;
+}
+.back-btn{
+  display:flex;align-items:center;gap:0.6rem;
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--red);text-decoration:none;cursor:none;
+  border:1px solid rgba(232,0,26,0.35);
+  padding:0.35rem 0.85rem;
+  transition:background 0.15s;
+  flex-shrink:0;
+}
+.back-btn:hover{background:rgba(232,0,26,0.1);}
+.topbar-title{
+  font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);font-family:Arial,sans-serif;font-weight:400;
+}
+.topbar-name{
+  margin-left:auto;
+  font-size:1rem;font-weight:900;letter-spacing:0.08em;
+  color:rgba(242,236,224,0.15);text-transform:uppercase;
+}
+
+/* HERO */
+.hero{
+  padding:6rem 3.5rem 3rem;
+  position:relative;
+}
+.hero-eyebrow{
+  font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;
+  color:var(--red);margin-bottom:0.75rem;
+  font-family:Arial,sans-serif;font-weight:400;
+  display:flex;align-items:center;gap:1rem;
+}
+.hero-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--red);}
+.hero-title{
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:900;letter-spacing:-0.02em;line-height:0.95;
+  text-transform:uppercase;
+}
+.hero-title .solid{
+  display:block;color:var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.55),6px 6px 0 rgba(0,0,0,0.85);
+}
+.hero-title .outline{
+  display:block;color:transparent;
+  -webkit-text-stroke:1.5px var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.25),6px 6px 0 rgba(0,0,0,0.9);
+  margin-top:0.1em;
+}
+.hero-sub{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);margin-top:1.2rem;
+}
+
+/* TABS */
+.tabs{
+  display:flex;align-items:flex-end;gap:0;
+  padding:0 3.5rem;
+  border-bottom:1px solid rgba(232,0,26,0.15);
+  margin-top:2.5rem;
+  position:relative;z-index:10;
+}
+.tab{
+  font-family:Arial,sans-serif;font-size:0.62rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.25);
+  padding:0.85rem 1.5rem 0.85rem 0;
+  cursor:none;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:color 0.15s,border-color 0.15s;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.tab:hover{color:rgba(242,236,224,0.55);}
+.tab.active{
+  color:var(--white);
+  border-bottom-color:var(--red);
+}
+.tab-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(232,0,26,0.3);
+  flex-shrink:0;
+  transition:background 0.15s,box-shadow 0.15s;
+}
+.tab.active .tab-dot{
+  background:var(--red);
+  box-shadow:0 0 6px var(--red);
+}
+
+/* CONTENT PANELS */
+.panels{padding:3rem 3.5rem 5rem;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* SECTION LABEL inside panel */
+.panel-label{
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(232,0,26,0.5);margin-bottom:2rem;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.panel-label::after{content:'';flex:1;max-width:200px;height:1px;background:linear-gradient(90deg,rgba(232,0,26,0.4),transparent);}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5px;
+  background:rgba(232,0,26,0.08);
+  border:1px solid rgba(232,0,26,0.08);
+}
+
+/* CARD */
+.card{
+  background:var(--surface);
+  position:relative;overflow:hidden;
+  cursor:none;
+  transition:background 0.15s;
+  display:flex;flex-direction:column;
+}
+.card:hover{background:#141414;}
+
+/* thumbnail area */
+.card-thumb{
+  position:relative;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#0a0a0a;
+  flex-shrink:0;
+}
+.card-thumb img,.card-thumb iframe{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+}
+/* play button overlay for video cards */
+.play-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.35);
+  transition:background 0.15s;
+}
+.card:hover .play-overlay{background:rgba(0,0,0,0.15);}
+.play-btn{
+  width:48px;height:48px;
+  border:2px solid rgba(242,236,224,0.7);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color 0.15s,background 0.15s;
+}
+.card:hover .play-btn{border-color:var(--red);background:rgba(232,0,26,0.15);}
+.play-icon{
+  width:0;height:0;
+  border-style:solid;
+  border-width:8px 0 8px 14px;
+  border-color:transparent transparent transparent rgba(242,236,224,0.9);
+  margin-left:3px;
+  transition:border-left-color 0.15s;
+}
+.card:hover .play-icon{border-left-color:var(--red);}
+
+/* card info */
+.card-info{padding:1.25rem;flex:1;}
+.card-num{
+  font-size:0.5rem;letter-spacing:0.15em;
+  color:rgba(232,0,26,0.4);font-family:Arial,sans-serif;
+  margin-bottom:0.4rem;
+}
+.card-title{
+  font-size:0.95rem;font-weight:900;letter-spacing:0.03em;
+  text-transform:uppercase;color:var(--white);
+  line-height:1.15;margin-bottom:0.4rem;
+  text-shadow:1px 1px 0 rgba(232,0,26,0.3);
+}
+.card-desc{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(242,236,224,0.28);
+}
+.card-tag{
+  display:inline-block;margin-top:0.75rem;
+  font-family:Arial,sans-serif;font-size:0.48rem;
+  letter-spacing:0.12em;text-transform:uppercase;
+  padding:0.15rem 0.5rem;
+  border:1px solid rgba(232,0,26,0.25);
+  color:rgba(232,0,26,0.4);
+}
+
+/* IMAGE CARD — no aspect ratio lock for portrait images */
+.card-thumb.img-thumb{aspect-ratio:4/3;}
+
+/* RED ACCENT LINE on left of card on hover */
+.card::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--red);
+  box-shadow:0 0 8px var(--red);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform 0.2s cubic-bezier(0.23,1,0.32,1);
+  z-index:2;
+}
+.card:hover::before{transform:scaleY(1);}
+
+/* ── VIDEO MODAL ── */
+.modal{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(4,4,4,0.96);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s;
+}
+.modal.open{opacity:1;pointer-events:all;}
+
+.modal-inner{
+  width:90%;max-width:900px;
+  transform:translateY(20px) skewX(-1deg);
+  opacity:0;
+  transition:transform 0.3s cubic-bezier(0.23,1,0.32,1),opacity 0.25s;
+}
+.modal.open .modal-inner{transform:translateY(0) skewX(0deg);opacity:1;}
+
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1rem;
+}
+.modal-title{
+  font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--red);font-family:Arial,sans-serif;
+}
+.modal-close{
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.5);cursor:none;
+  border:1px solid rgba(242,236,224,0.15);
+  padding:0.35rem 0.8rem;
+  transition:border-color 0.15s,color 0.15s;
+}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+
+.modal-video{
+  position:relative;width:100%;aspect-ratio:16/9;
+  background:#000;
+}
+.modal-video iframe,.modal-video video{
+  position:absolute;inset:0;width:100%;height:100%;border:none;
+}
+.modal-video video{object-fit:contain;background:#000;}
+
+.modal-meta{
+  margin-top:1rem;display:flex;align-items:baseline;gap:1.5rem;
+}
+.modal-name{
+  font-size:1.1rem;font-weight:900;letter-spacing:0.04em;
+  text-transform:uppercase;color:var(--white);
+  text-shadow:2px 2px 0 rgba(232,0,26,0.5);
+}
+.modal-sub{
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);
+}
+
+/* ── IMAGE LIGHTBOX ── */
+.lightbox{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(4,4,4,0.97);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s;
+}
+.lightbox.open{opacity:1;pointer-events:all;}
+.lightbox-img-wrap{
+  position:relative;
+  max-width:88vw;max-height:85vh;
+  transform:scale(0.96);
+  opacity:0;
+  transition:transform 0.3s cubic-bezier(0.23,1,0.32,1),opacity 0.25s;
+}
+.lightbox.open .lightbox-img-wrap{transform:scale(1);opacity:1;}
+.lightbox-img-wrap img{
+  display:block;
+  max-width:88vw;max-height:80vh;
+  object-fit:contain;
+}
+.lightbox-caption{
+  position:absolute;bottom:-2rem;left:0;right:0;
+  text-align:center;
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);
+}
+.lb-close{
+  position:absolute;top:-2.5rem;right:0;
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.4);cursor:none;
+  border:1px solid rgba(242,236,224,0.15);
+  padding:0.3rem 0.7rem;
+  transition:border-color 0.15s,color 0.15s;
+}
+.lb-close:hover{border-color:var(--red);color:var(--red);}
+.lb-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-size:1.2rem;color:rgba(242,236,224,0.25);
+  cursor:none;padding:1rem;
+  transition:color 0.15s;
+  font-family:Arial,sans-serif;
+}
+.lb-nav:hover{color:var(--red);}
+.lb-prev{left:-3.5rem;}
+.lb-next{right:-3.5rem;}
+
+/* STATUS BAR */
+.statusbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:400;
+  height:40px;
+  background:var(--red);
+  clip-path:polygon(0 35%,100% 0%,100% 100%,0% 100%);
+  display:flex;align-items:flex-end;padding:0 3.5rem 0.65rem;
+}
+.sb-hints{
+  display:flex;gap:2rem;
+  font-family:Arial,sans-serif;font-size:0.52rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(0,0,0,0.6);font-weight:700;
+}
+.sb-key{
+  background:rgba(0,0,0,0.2);padding:0.05rem 0.3rem;
+  border-radius:2px;color:rgba(0,0,0,0.75);margin-right:0.3rem;
+}
+
+#flash{
+  position:fixed;inset:0;z-index:950;
+  background:var(--red);opacity:0;pointer-events:none;
+  transition:opacity 0.07s;
+}
+#flash.on{opacity:0.4;}
+
+@media(max-width:768px){
+  .topbar{padding:0 1.5rem;}
+  .hero{padding:5rem 1.5rem 2rem;}
+  .tabs{padding:0 1.5rem;}
+  .panels{padding:2rem 1.5rem 5rem;}
+  .grid{grid-template-columns:1fr;}
+  .lb-prev{left:-2rem;}
+  .lb-next{right:-2rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="flash"></div>
+<div class="scan"></div>
+
+<div class="bg">
+  <canvas id="bgCanvas"></canvas>
+  <div class="hl hl1"></div>
+  <div class="hl hl2"></div>
+</div>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a class="back-btn" href="index.html">← Back</a>
+    <span class="topbar-title">Media Arts — Portfolio</span>
+    <span class="topbar-name">JE</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Creative Work</div>
+    <div class="hero-title">
+      <span class="solid">Media</span>
+      <span class="outline">Arts</span>
+    </div>
+    <div class="hero-sub">Motion Graphics · Animation · Visual Design</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" data-tab="ae">
+      <div class="tab-dot"></div>After Effects
+    </div>
+    <div class="tab" data-tab="ai">
+      <div class="tab-dot"></div>Illustrator
+    </div>
+    <div class="tab" data-tab="ps">
+      <div class="tab-dot"></div>Photoshop
+    </div>
+  </div>
+
+  <!-- PANELS -->
+  <div class="panels">
+
+    <!-- AFTER EFFECTS -->
+    <div class="panel active" id="panel-ae">
+      <div class="panel-label">After Effects — Motion & Animation</div>
+      <div class="grid">
+
+        <!-- 1. Macross kinetic type — YouTube -->
+        <div class="card" data-type="yt" data-ytid="jIu7XhDb7TI" data-title="Macross 82-99 FM" data-desc="Kinetic Typography">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/jIu7XhDb7TI/mqdefault.jpg" alt="Macross Kinetic Typography thumbnail">
+            <div class="play-overlay"><div class="play-btn"><div class="play-icon"></div></div></div>
+          </div>
+          <div class="card-info">
+            <div class="card-num">01</div>
+            <div class="card-title">Macross 82-99 FM</div>
+            <div class="card-desc">Kinetic Typography</div>
+            <span class="card-tag">After Effects · Type</span>
+          </div>
+        </div>
+
+        <!-- 2. Kirby Picnic — local mp4 -->
+        <div class="card" data-type="local" data-src="kirby picnic.mp4" data-poster="kirbypicnic.png" data-title="Kirby Picnic" data-desc="Animated Artwork">
+          <div class="card-thumb">
+            <img src="kirbypicnic.png" alt="Kirby Picnic animation thumbnail">
+            <div class="play-overlay"><div class="play-btn"><div class="play-icon"></div></div></div>
+          </div>
+          <div class="card-info">
+            <div class="card-num">02</div>
+            <div class="card-title">Kirby Picnic</div>
+            <div class="card-desc">Animated Official Artwork</div>
+            <span class="card-tag">After Effects · Frame Animation</span>
+          </div>
+        </div>
+
+        <!-- 3. Flag project — YouTube -->
+        <div class="card" data-type="yt" data-ytid="q2eOkGxC2ow" data-title="Flag Animation" data-desc="Motion Design Project">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/q2eOkGxC2ow/mqdefault.jpg" alt="Flag Animation thumbnail">
+            <div class="play-overlay"><div class="play-btn"><div class="play-icon"></div></div></div>
+          </div>
+          <div class="card-info">
+            <div class="card-num">03</div>
+            <div class="card-title">Flag Animation</div>
+            <div class="card-desc">Motion Design Project</div>
+            <span class="card-tag">After Effects · Motion</span>
+          </div>
+        </div>
+
+        <!-- 4. Ace Attorney rotoscope — YouTube -->
+        <div class="card" data-type="yt" data-ytid="Vq3AoF9ELV4" data-title="Ace Attorney Parody" data-desc="Rotoscoped Plushie Animation">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/Vq3AoF9ELV4/mqdefault.jpg" alt="Ace Attorney Parody thumbnail">
+            <div class="play-overlay"><div class="play-btn"><div class="play-icon"></div></div></div>
+          </div>
+          <div class="card-info">
+            <div class="card-num">04</div>
+            <div class="card-title">Ace Attorney Parody</div>
+            <div class="card-desc">Rotoscoped Plushie Animation</div>
+            <span class="card-tag">After Effects · Rotoscope</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ILLUSTRATOR -->
+    <div class="panel" id="panel-ai">
+      <div class="panel-label">Illustrator — Vector Design</div>
+      <div class="grid" id="ai-grid">
+
+        <div class="card" data-type="img" data-src="Illustrator 1.png" data-caption="Illustrator — Work 01">
+          <div class="card-thumb img-thumb">
+            <img src="Illustrator 1.png" alt="Illustrator work 1">
+          </div>
+          <div class="card-info">
+            <div class="card-num">01</div>
+            <div class="card-title">Illustration I</div>
+            <div class="card-desc">Vector Design</div>
+            <span class="card-tag">Illustrator</span>
+          </div>
+        </div>
+
+        <div class="card" data-type="img" data-src="Illustrator 2.png" data-caption="Illustrator — Work 02">
+          <div class="card-thumb img-thumb">
+            <img src="Illustrator 2.png" alt="Illustrator work 2">
+          </div>
+          <div class="card-info">
+            <div class="card-num">02</div>
+            <div class="card-title">Illustration II</div>
+            <div class="card-desc">Vector Design</div>
+            <span class="card-tag">Illustrator</span>
+          </div>
+        </div>
+
+        <div class="card" data-type="img" data-src="Illustrator 3.png" data-caption="Illustrator — Work 03">
+          <div class="card-thumb img-thumb">
+            <img src="Illustrator 3.png" alt="Illustrator work 3">
+          </div>
+          <div class="card-info">
+            <div class="card-num">03</div>
+            <div class="card-title">Illustration III</div>
+            <div class="card-desc">Vector Design</div>
+            <span class="card-tag">Illustrator</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PHOTOSHOP -->
+    <div class="panel" id="panel-ps">
+      <div class="panel-label">Photoshop — Digital Design</div>
+      <div class="grid" id="ps-grid">
+
+        <div class="card" data-type="img" data-src="Photoshop 1.png" data-caption="Photoshop — Work 01">
+          <div class="card-thumb img-thumb">
+            <img src="Photoshop 1.png" alt="Photoshop work 1">
+          </div>
+          <div class="card-info">
+            <div class="card-num">01</div>
+            <div class="card-title">Design I</div>
+            <div class="card-desc">Digital Design</div>
+            <span class="card-tag">Photoshop</span>
+          </div>
+        </div>
+
+        <div class="card" data-type="img" data-src="Photoshop 2.png" data-caption="Photoshop — Work 02">
+          <div class="card-thumb img-thumb">
+            <img src="Photoshop 2.png" alt="Photoshop work 2">
+          </div>
+          <div class="card-info">
+            <div class="card-num">02</div>
+            <div class="card-title">Design II</div>
+            <div class="card-desc">Digital Design</div>
+            <span class="card-tag">Photoshop</span>
+          </div>
+        </div>
+
+        <div class="card" data-type="img" data-src="Photoshop 3.png" data-caption="Photoshop — Work 03">
+          <div class="card-thumb img-thumb">
+            <img src="Photoshop 3.png" alt="Photoshop work 3">
+          </div>
+          <div class="card-info">
+            <div class="card-num">03</div>
+            <div class="card-title">Design III</div>
+            <div class="card-desc">Digital Design</div>
+            <span class="card-tag">Photoshop</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="sb-hints">
+      <span><span class="sb-key">Click</span>Open</span>
+      <span><span class="sb-key">Esc</span>Close</span>
+      <span><span class="sb-key">←→</span>Navigate Images</span>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- VIDEO MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-label">— Video</div>
+      <div class="modal-close" id="modal-close">✕ Close</div>
+    </div>
+    <div class="modal-video" id="modal-video"></div>
+    <div class="modal-meta">
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-sub" id="modal-sub"></div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-img-wrap" id="lb-wrap">
+    <div class="lb-close" id="lb-close">✕ Close</div>
+    <div class="lb-nav lb-prev" id="lb-prev">‹</div>
+    <div class="lb-nav lb-next" id="lb-next">›</div>
+    <img id="lb-img" src="" alt="">
+    <div class="lightbox-caption" id="lb-cap"></div>
+  </div>
+</div>
+
+<script>
+// Cursor
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';
+  cur.style.top=e.clientY+'px';
+});
+
+// Flash
+const flash=document.getElementById('flash');
+function doFlash(cb){
+  flash.classList.add('on');
+  setTimeout(()=>{flash.classList.remove('on');if(cb)cb();},100);
+}
+
+// ── TABS ──
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.panel');
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    doFlash(()=>{
+      tabs.forEach(t=>t.classList.remove('active'));
+      panels.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+});
+
+// ── VIDEO MODAL ──
+const modal=document.getElementById('modal');
+const modalVideo=document.getElementById('modal-video');
+const modalName=document.getElementById('modal-name');
+const modalSub=document.getElementById('modal-sub');
+const modalLabel=document.getElementById('modal-label');
+
+function openYT(ytid,title,desc){
+  modalVideo.innerHTML=`<iframe src="https://www.youtube.com/embed/${ytid}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+  modalName.textContent=title;
+  modalSub.textContent=desc;
+  modalLabel.textContent='— '+desc;
+  modal.classList.add('open');
+}
+
+function openLocal(src,poster,title,desc){
+  modalVideo.innerHTML=`<video controls autoplay poster="${poster}"><source src="${src}" type="video/mp4">Your browser does not support video.</video>`;
+  modalName.textContent=title;
+  modalSub.textContent=desc;
+  modalLabel.textContent='— '+desc;
+  modal.classList.add('open');
+}
+
+function closeModal(){
+  modal.classList.remove('open');
+  setTimeout(()=>{ modalVideo.innerHTML=''; },300);
+}
+
+document.getElementById('modal-close').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{ if(e.target===modal)closeModal(); });
+
+// ── IMAGE LIGHTBOX ──
+const lightbox=document.getElementById('lightbox');
+const lbImg=document.getElementById('lb-img');
+const lbCap=document.getElementById('lb-cap');
+let lbImages=[];
+let lbIdx=0;
+
+function openLightbox(src,caption,allImgs,startIdx){
+  lbImages=allImgs;
+  lbIdx=startIdx;
+  lbImg.src=src;
+  lbCap.textContent=caption;
+  lightbox.classList.add('open');
+}
+
+function lbGo(dir){
+  lbIdx=(lbIdx+dir+lbImages.length)%lbImages.length;
+  const item=lbImages[lbIdx];
+  lbImg.src=item.src;
+  lbCap.textContent=item.caption;
+}
+
+function closeLightbox(){
+  lightbox.classList.remove('open');
+  setTimeout(()=>{ lbImg.src=''; },300);
+}
+
+document.getElementById('lb-close').addEventListener('click',closeLightbox);
+document.getElementById('lb-prev').addEventListener('click',()=>lbGo(-1));
+document.getElementById('lb-next').addEventListener('click',()=>lbGo(1));
+lightbox.addEventListener('click',e=>{ if(e.target===lightbox)closeLightbox(); });
+
+// ── CARD CLICK HANDLER ──
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const type=card.dataset.type;
+    if(type==='yt'){
+      openYT(card.dataset.ytid, card.dataset.title, card.dataset.desc);
+    } else if(type==='local'){
+      openLocal(card.dataset.src, card.dataset.poster, card.dataset.title, card.dataset.desc);
+    } else if(type==='img'){
+      // Gather all image cards in current active panel
+      const activePanel=document.querySelector('.panel.active');
+      const imgCards=Array.from(activePanel.querySelectorAll('.card[data-type="img"]'));
+      const allImgs=imgCards.map(c=>({src:c.dataset.src,caption:c.dataset.caption}));
+      const myIdx=imgCards.indexOf(card);
+      openLightbox(card.dataset.src, card.dataset.caption, allImgs, myIdx);
+    }
+  });
+});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(modal.classList.contains('open')){
+    if(e.key==='Escape')closeModal();
+    return;
+  }
+  if(lightbox.classList.contains('open')){
+    if(e.key==='Escape')closeLightbox();
+    if(e.key==='ArrowLeft')lbGo(-1);
+    if(e.key==='ArrowRight')lbGo(1);
+    return;
+  }
+});
+
+// ── BACK LINK ──
+document.querySelector('.back-btn').addEventListener('click',e=>{
+  e.preventDefault();
+  doFlash(()=>{ window.location.href='index.html'; });
+});
+
+// ── BACKGROUND CANVAS ──
+(()=>{
+  const canvas=document.getElementById('bgCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+
+  const streaks=Array.from({length:16},()=>mkStreak());
+  function mkStreak(){
+    const angle=(-15+Math.random()*8)*Math.PI/180;
+    const alpha=0.02+Math.random()*0.04;
+    return{
+      x:Math.random()*1.6*window.innerWidth-0.3*window.innerWidth,
+      y:Math.random()*window.innerHeight,
+      angle,speed:0.1+Math.random()*0.2,
+      len:60+Math.random()*200,alpha,w:0.4+Math.random()*0.8,
+      color:Math.random()<0.75?`rgba(242,236,224,${alpha})`:Math.random()<0.5?`rgba(232,0,26,${alpha*0.8})`:`rgba(100,200,255,${alpha*0.7})`,
+    };
+  }
+  function tickStreak(s){
+    s.x+=Math.cos(s.angle)*s.speed;s.y+=Math.sin(s.angle)*s.speed;
+    if(s.x>W+400)s.x=-400;if(s.y>H+40)s.y=-40;if(s.x<-400)s.x=W+400;
+  }
+  function drawStreak(s){
+    const ex=s.x+Math.cos(s.angle)*s.len,ey=s.y+Math.sin(s.angle)*s.len;
+    const g=ctx.createLinearGradient(s.x,s.y,ex,ey);
+    g.addColorStop(0,'transparent');g.addColorStop(0.4,s.color);g.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(ex,ey);
+    ctx.strokeStyle=g;ctx.lineWidth=s.w;ctx.stroke();
+  }
+
+  const geos=Array.from({length:22},()=>mkGeo());
+  function mkGeo(){
+    const sides=Math.random()<0.5?3:4;
+    const tier=Math.random();
+    const size=tier<0.30?6+Math.random()*14:tier<0.60?20+Math.random()*40:tier<0.82?60+Math.random()*90:150+Math.random()*150;
+    const alpha=size>120?0.006+Math.random()*0.012:size>50?0.012+Math.random()*0.022:0.025+Math.random()*0.05;
+    const filled=size>80?false:Math.random()<0.28;
+    const sc=size>100?0.4:size>40?0.7:1.0;
+    const speed={x:(Math.random()-0.5)*0.32*sc,y:(Math.random()-0.5)*0.22*sc,r:(Math.random()-0.5)*0.006*sc};
+    const roll=Math.random();
+    const col=roll<0.50?`rgba(80,80,80,${alpha})`:roll<0.72?`rgba(45,45,45,${alpha})`:roll<0.88?`rgba(232,0,26,${alpha})`:`rgba(150,150,150,${alpha})`;
+    return{x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,size,sides,filled,speed,col,rot:Math.random()*Math.PI*2};
+  }
+  function tickGeo(g){
+    g.x+=g.speed.x;g.y+=g.speed.y;g.rot+=g.speed.r;
+    const buf=g.size+20;
+    if(g.x<-buf)g.x=W+buf;if(g.x>W+buf)g.x=-buf;
+    if(g.y<-buf)g.y=H+buf;if(g.y>H+buf)g.y=-buf;
+  }
+  function drawGeo(g){
+    ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rot);
+    ctx.beginPath();
+    for(let i=0;i<g.sides;i++){const a=(i/g.sides)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*g.size,Math.sin(a)*g.size):ctx.lineTo(Math.cos(a)*g.size,Math.sin(a)*g.size);}
+    ctx.closePath();
+    if(g.filled){ctx.fillStyle=g.col;ctx.fill();}
+    else{ctx.strokeStyle=g.col;ctx.lineWidth=0.5;ctx.stroke();}
+    ctx.restore();
+  }
+
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    streaks.forEach(s=>{tickStreak(s);drawStreak(s);});
+    geos.forEach(g=>{tickGeo(g);drawGeo(g);});
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
