@@ -7,13 +7,13 @@
 <link rel="icon" type="image/png" href="GDK.png">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-
+ 
 :root{
   --red:#e8001a;
   --black:#080808;
   --white:#f2ece0;
 }
-
+ 
 html,body{
   width:100%;height:100%;overflow:hidden;
   background:var(--black);
@@ -21,7 +21,7 @@ html,body{
   cursor:none;
   user-select:none;
 }
-
+ 
 #cur{
   position:fixed;z-index:9999;pointer-events:none;
   width:10px;height:10px;
@@ -29,12 +29,12 @@ html,body{
   transform:translate(-50%,-50%) rotate(45deg);
   box-shadow:0 0 8px var(--red);
 }
-
+ 
 .scan{
   position:fixed;inset:0;z-index:800;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
 }
-
+ 
 .bg{position:fixed;inset:0;overflow:hidden;}
 #bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
 .bg::before{
@@ -51,13 +51,13 @@ html,body{
 .hl1{top:8%;transform:rotate(-2deg);opacity:0.5;box-shadow:0 0 12px var(--red);}
 .hl2{top:8.4%;transform:rotate(-2deg);opacity:0.15;}
 .hl3{bottom:12%;transform:rotate(-1.5deg);opacity:0.3;}
-
+ 
 .shell{
   position:fixed;inset:0;z-index:100;
   display:grid;
   grid-template-columns:1fr 460px;
 }
-
+ 
 /* LEFT */
 .identity{
   position:relative;
@@ -113,7 +113,7 @@ html,body{
   display:flex;align-items:center;gap:1rem;
 }
 .id-role::after{content:'';width:50px;height:1px;background:rgba(242,236,224,0.12);}
-
+ 
 /* DIAGONAL CUT */
 .cut{
   position:absolute;top:0;right:-1px;
@@ -129,7 +129,7 @@ html,body{
   box-shadow:0 0 16px rgba(232,0,26,0.6),-3px 0 24px rgba(232,0,26,0.25);
   z-index:51;
 }
-
+ 
 /* RIGHT PANEL */
 .panel{
   background:rgba(8,8,8,0.97);
@@ -156,7 +156,7 @@ html,body{
   display:flex;align-items:center;gap:0.75rem;
 }
 .panel-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(232,0,26,0.4),transparent);}
-
+ 
 /* MENU */
 .menu{list-style:none;position:relative;}
 .mi{
@@ -234,7 +234,7 @@ html,body{
   opacity:0;transition:opacity 0.3s ease;
 }
 .mi.active .mi-geo{opacity:1;}
-
+ 
 /* STATUS BAR */
 .statusbar{
   position:absolute;bottom:0;left:0;right:0;height:44px;
@@ -252,7 +252,7 @@ html,body{
   background:rgba(0,0,0,0.2);padding:0.05rem 0.35rem;
   border-radius:2px;color:rgba(0,0,0,0.8);margin-right:0.35rem;
 }
-
+ 
 /* OVERLAY */
 .overlay{
   position:fixed;inset:0;z-index:600;
@@ -329,7 +329,7 @@ html,body{
 }
 .sub-arr{z-index:1;font-size:0.9rem;color:rgba(232,0,26,0.35);transition:color 0.15s,transform 0.15s;}
 .sub-item:hover .sub-arr{color:var(--red);transform:translateX(4px);}
-
+ 
 /* COMING SOON */
 .cs-wrap{text-align:center;padding:0 2.5rem;}
 .cs-diamond{
@@ -353,14 +353,14 @@ html,body{
 .cs-bar{width:160px;height:2px;background:rgba(242,236,224,0.07);margin:0 auto;overflow:hidden;}
 .cs-fill{height:100%;background:var(--red);animation:prog 2s ease-in-out infinite alternate;box-shadow:0 0 8px var(--red);}
 @keyframes prog{from{width:20%;margin-left:0;}to{width:50%;margin-left:30%;}}
-
+ 
 #flash{
   position:fixed;inset:0;z-index:700;
   background:var(--red);opacity:0;pointer-events:none;
   transition:opacity 0.07s;
 }
 #flash.on{opacity:0.4;}
-
+ 
 @media(max-width:768px){
   .shell{grid-template-columns:1fr;}
   .identity{display:none;}
@@ -370,7 +370,7 @@ html,body{
 </style>
 </head>
 <body>
-
+ 
 <div id="cur"></div>
 <div id="flash"></div>
 <div class="scan"></div>
@@ -380,7 +380,7 @@ html,body{
   <div class="hl hl2"></div>
   <div class="hl hl3"></div>
 </div>
-
+ 
 <div class="shell">
   <div class="identity">
     <div class="id-slab"></div>
@@ -395,7 +395,7 @@ html,body{
     <div class="cut"></div>
     <div class="cut-line"></div>
   </div>
-
+ 
   <div class="panel">
     <div class="corner"></div>
     <div class="panel-label">Select Category</div>
@@ -459,7 +459,7 @@ html,body{
     </div>
   </div>
 </div>
-
+ 
 <!-- WEB DESIGN OVERLAY -->
 <div class="overlay" id="ovWeb">
   <div class="overlay-accent"></div>
@@ -485,7 +485,7 @@ html,body{
     </div>
   </div>
 </div>
-
+ 
 <!-- COMING SOON OVERLAY -->
 <div class="overlay" id="ovCS">
   <div class="overlay-accent"></div>
@@ -499,27 +499,27 @@ html,body{
     </div>
   </div>
 </div>
-
+ 
 <script>
 const cur=document.getElementById('cur');
 const flash=document.getElementById('flash');
 const items=Array.from(document.querySelectorAll('.mi'));
 let idx=0;
-
+ 
 document.addEventListener('mousemove',e=>{
   cur.style.left=e.clientX+'px';
   cur.style.top=e.clientY+'px';
 });
-
+ 
 function setActive(i){
   items.forEach(el=>el.classList.remove('active'));
   items[i].classList.add('active');
   idx=i;
   geoSystem.onSelect(i);
 }
-
+ 
 items.forEach((el,i)=>el.addEventListener('mouseenter',()=>setActive(i)));
-
+ 
 document.addEventListener('keydown',e=>{
   const anyOpen=document.querySelector('.overlay.open');
   if(anyOpen){if(e.key==='Escape')closeAll();return;}
@@ -527,14 +527,14 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(idx-1,0));}
   if(e.key==='Enter'){e.preventDefault();trigger(items[idx].dataset.action);}
 });
-
+ 
 items.forEach(el=>el.addEventListener('click',()=>trigger(el.dataset.action)));
-
+ 
 function doFlash(cb){
   flash.classList.add('on');
   setTimeout(()=>{flash.classList.remove('on');if(cb)cb();},110);
 }
-
+ 
 function trigger(action){
   doFlash(()=>{
     if(action==='webdesign')document.getElementById('ovWeb').classList.add('open');
@@ -543,16 +543,16 @@ function trigger(action){
     else document.getElementById('ovCS').classList.add('open');
   });
 }
-
+ 
 function closeAll(){
   doFlash(()=>{
     document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
   });
 }
-
+ 
 document.getElementById('webBack').addEventListener('click',closeAll);
 document.getElementById('csBack').addEventListener('click',closeAll);
-
+ 
 /* ── GEOMETRY SYSTEM ── */
 const geoSystem = (() => {
   // Colors: black, white, red, light blue
@@ -566,13 +566,13 @@ const geoSystem = (() => {
     'rgba(120,210,255,0.15)',
     'rgba(242,236,224,0.07)',
   ];
-
+ 
   // Each item gets its own set of shapes
   const itemStates = items.map((el, i) => {
     const svg = el.querySelector('.mi-geo');
     return { svg, shapes: [], animating: false, slowSpeed: 0.18, fastSpeed: 3.2 };
   });
-
+ 
   // Build shapes for a given svg element (called lazily on first activate)
   function initShapes(state) {
     if (state.shapes.length) return;
@@ -581,7 +581,7 @@ const geoSystem = (() => {
     const rect = svg.parentElement.getBoundingClientRect();
     const W = rect.width || 460;
     const H = rect.height || 62;
-
+ 
     // Safe zones: shapes live in margins around the text
     // Left margin: 0 to ~48px (num + arr area)
     // Right margin: last ~50px (tag area)
@@ -597,10 +597,10 @@ const geoSystem = (() => {
       // very bottom sliver
       { xMin: 48, xMax: W - 52, yMin: H - 14, yMax: H - 4 },
     ];
-
+ 
     const shapeCount = 7;
     const shapes = [];
-
+ 
     for (let s = 0; s < shapeCount; s++) {
       const zone = zones[s % zones.length];
       const cx = zone.xMin + Math.random() * (zone.xMax - zone.xMin);
@@ -609,7 +609,7 @@ const geoSystem = (() => {
       const sides = Math.random() < 0.5 ? 3 : 4;
       const size = 4 + Math.random() * 9; // 4–13px
       const fillIdx = Math.floor(Math.random() * FILLS.length);
-
+ 
       // Generate vertices around center, clamped to zone
       const verts = [];
       for (let v = 0; v < sides; v++) {
@@ -628,15 +628,15 @@ const geoSystem = (() => {
           ox: vx, oy: vy, // original center
         });
       }
-
+ 
       const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
       poly.setAttribute('fill', FILLS[fillIdx]);
       poly.setAttribute('stroke', 'none');
       svg.appendChild(poly);
-
+ 
       shapes.push({ poly, verts, fillIdx });
     }
-
+ 
     // Set svg viewBox to match item size
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('preserveAspectRatio', 'none');
@@ -644,12 +644,12 @@ const geoSystem = (() => {
     state.W = W;
     state.H = H;
   }
-
+ 
   function updatePolygon(shape) {
     const pts = shape.verts.map(v => `${v.x.toFixed(2)},${v.y.toFixed(2)}`).join(' ');
     shape.poly.setAttribute('points', pts);
   }
-
+ 
   // Set new random targets for all vertices
   function randomizeTargets(state, speed) {
     state.shapes.forEach(shape => {
@@ -662,7 +662,7 @@ const geoSystem = (() => {
     });
     state.currentSpeed = speed;
   }
-
+ 
   // Lerp all vertices toward their targets; returns true if still moving
   function lerpShapes(state) {
     const spd = state.currentSpeed || state.slowSpeed;
@@ -683,10 +683,10 @@ const geoSystem = (() => {
     });
     return moving;
   }
-
+ 
   let rafId = null;
   let slowDriftTimer = null;
-
+ 
   function startLoop() {
     if (rafId) return;
     function loop() {
@@ -697,11 +697,11 @@ const geoSystem = (() => {
     }
     rafId = requestAnimationFrame(loop);
   }
-
+ 
   function stopLoop() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   }
-
+ 
   function scheduleSlow(state) {
     if (slowDriftTimer) clearInterval(slowDriftTimer);
     // Every 2.5s pick new gentle targets
@@ -711,19 +711,19 @@ const geoSystem = (() => {
       }
     }, 2500);
   }
-
+ 
   function onSelect(i) {
     // Stop any slow drift timer
     if (slowDriftTimer) clearInterval(slowDriftTimer);
     stopLoop();
-
+ 
     const state = itemStates[i];
     initShapes(state);
-
+ 
     // Fast burst to new positions
     randomizeTargets(state, state.fastSpeed);
     startLoop();
-
+ 
     // After ~600ms, slow down and schedule gentle drift
     setTimeout(() => {
       if (itemStates[idx] === state) {
@@ -732,10 +732,10 @@ const geoSystem = (() => {
       }
     }, 600);
   }
-
+ 
   // Kick off initial state
   setTimeout(() => onSelect(0), 100);
-
+ 
   return { onSelect };
 })();
 /* ── BACKGROUND CANVAS ── */
@@ -743,17 +743,17 @@ const geoSystem = (() => {
   const canvas = document.getElementById('bgCanvas');
   const ctx = canvas.getContext('2d');
   let W, H;
-
+ 
   function resize(){
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
   resize();
   window.addEventListener('resize', resize);
-
+ 
   // ── STREAKS OF LIGHT ──
   const streaks = Array.from({length:18}, ()=>makeStreak());
-
+ 
   function makeStreak(){
     const angle = (-15 + Math.random()*8) * Math.PI/180; // nearly horizontal, slight negative tilt
     const speed = 0.08 + Math.random()*0.18;
@@ -772,7 +772,7 @@ const geoSystem = (() => {
           : `rgba(100,200,255,${alpha*0.7})`,
     };
   }
-
+ 
   function updateStreak(s){
     s.x += Math.cos(s.angle) * s.speed;
     s.y += Math.sin(s.angle) * s.speed;
@@ -781,7 +781,7 @@ const geoSystem = (() => {
     if(s.y > H+40)  s.y = -40;
     if(s.x < -400)  s.x = W+400;
   }
-
+ 
   function drawStreak(s){
     const ex = s.x + Math.cos(s.angle)*s.len;
     const ey = s.y + Math.sin(s.angle)*s.len;
@@ -796,26 +796,35 @@ const geoSystem = (() => {
     ctx.lineWidth = s.w;
     ctx.stroke();
   }
-
+ 
   // ── FLOATING GEOMETRY ──
-  // Small dim triangles/quads drifting slowly
-  const geos = Array.from({length:22}, ()=>makeGeo());
-
+  const geos = Array.from({length:26}, ()=>makeGeo());
+ 
   function makeGeo(){
-    const sides  = Math.random()<0.5 ? 3 : 4;
-    const size   = 6 + Math.random()*22;
-    const alpha  = 0.015 + Math.random()*0.04;
-    const filled = Math.random()<0.3; // mostly just strokes
-    const speed  = {
-      x: (Math.random()-0.5)*0.12,
-      y: (Math.random()-0.5)*0.08,
-      r: (Math.random()-0.5)*0.003,
+    const sides = Math.random()<0.5 ? 3 : 4;
+    // tiered sizing: small / medium / large / huge
+    const tier = Math.random();
+    const size = tier < 0.30 ? 6  + Math.random()*14        // small:  6–20px
+               : tier < 0.60 ? 20 + Math.random()*40        // medium: 20–60px
+               : tier < 0.82 ? 60 + Math.random()*90        // large:  60–150px
+               :               150 + Math.random()*150;     // huge:   150–300px (radius, so ~300–600px across)
+    // bigger = more transparent so they don't overpower
+    const alpha = size > 120 ? 0.006 + Math.random()*0.012
+                : size > 50  ? 0.012 + Math.random()*0.022
+                :              0.025 + Math.random()*0.05;
+    const filled = size > 80 ? false : Math.random()<0.28; // huge shapes always just outline
+    const speedScale = size > 100 ? 0.4 : size > 40 ? 0.7 : 1.0; // bigger = slower drift
+    const speed = {
+      x: (Math.random()-0.5) * 0.32 * speedScale,
+      y: (Math.random()-0.5) * 0.22 * speedScale,
+      r: (Math.random()-0.5) * 0.006 * speedScale,
     };
-    const col = Math.random()<0.6
-      ? `rgba(242,236,224,${alpha})`
-      : Math.random()<0.5
-        ? `rgba(232,0,26,${alpha})`
-        : `rgba(100,200,255,${alpha})`;
+    // dull gray and red, no cyan
+    const roll = Math.random();
+    const col = roll < 0.50 ? `rgba(80,80,80,${alpha})`
+              : roll < 0.72 ? `rgba(45,45,45,${alpha})`
+              : roll < 0.88 ? `rgba(232,0,26,${alpha})`
+              :                `rgba(150,150,150,${alpha})`;
     return {
       x: Math.random()*window.innerWidth,
       y: Math.random()*window.innerHeight,
@@ -823,17 +832,18 @@ const geoSystem = (() => {
       rot: Math.random()*Math.PI*2,
     };
   }
-
+ 
   function updateGeo(g){
     g.x   += g.speed.x;
     g.y   += g.speed.y;
     g.rot += g.speed.r;
-    if(g.x < -60)   g.x = W+60;
-    if(g.x > W+60)  g.x = -60;
-    if(g.y < -60)   g.y = H+60;
-    if(g.y > H+60)  g.y = -60;
+    const buf = g.size + 20;
+    if(g.x < -buf)   g.x = W+buf;
+    if(g.x > W+buf)  g.x = -buf;
+    if(g.y < -buf)   g.y = H+buf;
+    if(g.y > H+buf)  g.y = -buf;
   }
-
+ 
   function drawGeo(g){
     ctx.save();
     ctx.translate(g.x, g.y);
@@ -856,17 +866,17 @@ const geoSystem = (() => {
     }
     ctx.restore();
   }
-
+ 
   // ── RENDER LOOP ──
   function frame(){
     ctx.clearRect(0,0,W,H);
-
+ 
     // Draw streaks
     streaks.forEach(s=>{ updateStreak(s); drawStreak(s); });
-
+ 
     // Draw geometry
     geos.forEach(g=>{ updateGeo(g); drawGeo(g); });
-
+ 
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
