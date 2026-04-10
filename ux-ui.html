@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX / UI Design — Joshua Easo</title>
+<link rel="icon" type="image/png" href="GDK.png">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --red:#e8001a;
+  --black:#080808;
+  --white:#f2ece0;
+  --surface:#0f0f0f;
+  --surface2:#141414;
+  --border:rgba(242,236,224,0.06);
+}
+
+html,body{
+  width:100%;min-height:100%;
+  background:var(--black);
+  font-family:'Arial Black','Arial Bold',Arial,sans-serif;
+  cursor:none;
+  user-select:none;
+  overflow-x:hidden;
+}
+
+#cur{
+  position:fixed;z-index:9999;pointer-events:none;
+  width:10px;height:10px;
+  background:var(--red);
+  transform:translate(-50%,-50%) rotate(45deg);
+  box-shadow:0 0 8px var(--red);
+}
+
+.scan{
+  position:fixed;inset:0;z-index:800;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
+}
+
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;}
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.bg::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(-55deg,transparent 0,transparent 38px,rgba(255,255,255,0.018) 38px,rgba(255,255,255,0.018) 39px);
+}
+.bg::after{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(0,0,0,0.75) 100%);
+}
+.hl{position:absolute;left:-5%;width:110%;height:1px;background:var(--red);z-index:3;}
+.hl1{top:6%;transform:rotate(-2deg);opacity:0.4;box-shadow:0 0 12px var(--red);}
+.hl2{top:6.4%;transform:rotate(-2deg);opacity:0.12;}
+
+/* PAGE */
+.page{position:relative;z-index:100;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOP BAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  height:56px;
+  background:rgba(8,8,8,0.95);
+  border-bottom:1px solid rgba(232,0,26,0.15);
+  display:flex;align-items:center;
+  padding:0 2.5rem;gap:2rem;
+}
+.back-btn{
+  display:flex;align-items:center;gap:0.6rem;
+  font-family:Arial,sans-serif;font-size:0.6rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--red);text-decoration:none;cursor:none;
+  border:1px solid rgba(232,0,26,0.35);
+  padding:0.35rem 0.85rem;
+  transition:background 0.15s;flex-shrink:0;
+}
+.back-btn:hover{background:rgba(232,0,26,0.1);}
+.topbar-title{
+  font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);font-family:Arial,sans-serif;font-weight:400;
+}
+.topbar-name{
+  margin-left:auto;font-size:1rem;font-weight:900;
+  letter-spacing:0.08em;color:rgba(242,236,224,0.15);text-transform:uppercase;
+}
+
+/* HERO */
+.hero{padding:6rem 3.5rem 3rem;position:relative;}
+.hero-eyebrow{
+  font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;
+  color:var(--red);margin-bottom:0.75rem;
+  font-family:Arial,sans-serif;font-weight:400;
+  display:flex;align-items:center;gap:1rem;
+}
+.hero-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--red);}
+.hero-title{
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:900;letter-spacing:-0.02em;line-height:0.95;text-transform:uppercase;
+}
+.hero-title .solid{
+  display:block;color:var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.55),6px 6px 0 rgba(0,0,0,0.85);
+}
+.hero-title .outline{
+  display:block;color:transparent;
+  -webkit-text-stroke:1.5px var(--white);
+  text-shadow:3px 3px 0 rgba(232,0,26,0.25),6px 6px 0 rgba(0,0,0,0.9);
+  margin-top:0.1em;
+}
+.hero-sub{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:rgba(242,236,224,0.3);margin-top:1.2rem;
+}
+
+/* CONTENT */
+.content{padding:2.5rem 3.5rem 6rem;}
+
+/* PROJECT CARD — full width hero card */
+.project-hero{
+  position:relative;
+  background:var(--surface);
+  border:1px solid rgba(232,0,26,0.1);
+  overflow:hidden;
+  margin-bottom:1.5px;
+}
+/* Left red bar */
+.project-hero::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--red);
+  box-shadow:0 0 12px var(--red);
+}
+
+.ph-top{
+  padding:2.5rem 2.5rem 2rem 3rem;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:2rem;flex-wrap:wrap;
+}
+.ph-meta{}
+.ph-num{
+  font-size:0.55rem;letter-spacing:0.15em;
+  color:rgba(232,0,26,0.4);font-family:Arial,sans-serif;
+  margin-bottom:0.5rem;
+}
+.ph-title{
+  font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:900;letter-spacing:-0.01em;text-transform:uppercase;
+  color:var(--white);line-height:1;
+  text-shadow:3px 3px 0 rgba(232,0,26,0.4),5px 5px 0 rgba(0,0,0,0.8);
+  margin-bottom:0.5rem;
+}
+.ph-subtitle{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.35);margin-bottom:1.25rem;
+}
+.ph-desc{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.8rem;line-height:1.75;
+  color:rgba(242,236,224,0.55);
+  max-width:520px;
+}
+
+/* TAGS ROW */
+.ph-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.25rem;}
+.ph-tag{
+  font-family:Arial,sans-serif;font-size:0.5rem;
+  letter-spacing:0.12em;text-transform:uppercase;
+  padding:0.25rem 0.65rem;
+  border:1px solid rgba(232,0,26,0.25);
+  color:rgba(232,0,26,0.45);
+}
+
+/* STATS */
+.ph-stats{
+  display:flex;flex-direction:column;gap:1.5rem;
+  min-width:160px;
+}
+.stat-item{}
+.stat-val{
+  font-size:1.6rem;font-weight:900;letter-spacing:-0.02em;
+  color:var(--red);line-height:1;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.8);
+}
+.stat-label{
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(242,236,224,0.25);margin-top:0.2rem;
+}
+
+/* DIVIDER */
+.ph-divider{
+  height:1px;
+  background:linear-gradient(90deg,rgba(232,0,26,0.3),rgba(232,0,26,0.05),transparent);
+  margin:0 3rem;
+}
+
+/* ACTION BUTTONS ROW */
+.ph-actions{
+  padding:1.75rem 2.5rem 1.75rem 3rem;
+  display:flex;gap:1rem;flex-wrap:wrap;align-items:center;
+}
+.btn-primary{
+  font-family:Arial,sans-serif;font-size:0.65rem;
+  letter-spacing:0.18em;text-transform:uppercase;
+  padding:0.8rem 1.75rem;
+  background:var(--red);color:rgba(0,0,0,0.85);
+  border:none;cursor:none;font-weight:700;
+  clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);
+  transition:opacity 0.15s,transform 0.15s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;
+}
+.btn-primary:hover{opacity:0.88;transform:translateX(2px);}
+.btn-secondary{
+  font-family:Arial,sans-serif;font-size:0.65rem;
+  letter-spacing:0.18em;text-transform:uppercase;
+  padding:0.8rem 1.75rem;
+  background:transparent;
+  border:1px solid rgba(242,236,224,0.2);
+  color:rgba(242,236,224,0.55);
+  cursor:none;
+  clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);
+  transition:border-color 0.15s,color 0.15s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;
+}
+.btn-secondary:hover{border-color:rgba(232,0,26,0.5);color:var(--white);}
+.btn-note{
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(242,236,224,0.2);margin-left:0.5rem;
+}
+
+/* PREVIEW SECTION — iframe embed */
+.preview-section{
+  background:var(--surface);
+  border:1px solid rgba(232,0,26,0.08);
+  border-top:none;
+  overflow:hidden;
+}
+.preview-header{
+  padding:1.25rem 3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(232,0,26,0.08);
+  background:rgba(0,0,0,0.3);
+}
+.preview-label{
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(232,0,26,0.5);
+  display:flex;align-items:center;gap:0.75rem;
+}
+.preview-label::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 6px var(--red);
+}
+.preview-toggle{
+  display:flex;gap:0;
+}
+.ptog{
+  font-family:Arial,sans-serif;font-size:0.52rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  padding:0.35rem 0.9rem;
+  border:1px solid rgba(232,0,26,0.2);
+  color:rgba(242,236,224,0.25);
+  cursor:none;
+  transition:all 0.15s;
+}
+.ptog:first-child{border-right:none;}
+.ptog.active{
+  background:rgba(232,0,26,0.15);
+  border-color:rgba(232,0,26,0.5);
+  color:var(--white);
+}
+
+.preview-frame{
+  position:relative;
+  width:100%;
+  background:#050505;
+}
+/* Prototype view — phone mockup centered */
+.preview-frame.proto-view{
+  display:flex;align-items:center;justify-content:center;
+  padding:3rem 2rem;
+  min-height:700px;
+}
+.phone-shell{
+  position:relative;
+  width:340px;
+  background:#111;
+  border-radius:40px;
+  border:2px solid rgba(242,236,224,0.1);
+  box-shadow:
+    0 0 0 1px rgba(232,0,26,0.15),
+    0 40px 80px rgba(0,0,0,0.8),
+    inset 0 0 20px rgba(0,0,0,0.5);
+  overflow:hidden;
+  flex-shrink:0;
+}
+.phone-notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:28px;
+  background:#111;border-radius:0 0 20px 20px;
+  z-index:10;
+}
+.phone-iframe{
+  width:100%;height:680px;
+  border:none;display:block;
+}
+/* Blueprint view — full width iframe */
+.preview-frame.blueprint-view{
+  display:block;
+  height:620px;
+}
+.blueprint-iframe{
+  width:100%;height:100%;border:none;display:block;
+}
+
+/* placeholder when iframe not loaded */
+.frame-placeholder{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#050505;
+  pointer-events:none;
+  opacity:1;transition:opacity 0.3s;
+}
+.frame-placeholder.hidden{opacity:0;}
+.fp-spinner{
+  width:32px;height:32px;
+  border:1px solid rgba(232,0,26,0.2);
+  border-top-color:var(--red);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin-bottom:1rem;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.fp-text{
+  font-family:Arial,sans-serif;font-size:0.55rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(242,236,224,0.2);
+}
+
+/* PROCESS SECTION */
+.process-section{
+  margin-top:1.5px;
+  background:var(--surface);
+  border:1px solid rgba(232,0,26,0.08);
+}
+.process-header{
+  padding:1.5rem 3rem;
+  border-bottom:1px solid rgba(232,0,26,0.08);
+}
+.process-title-row{
+  display:flex;align-items:center;gap:1rem;
+  font-size:0.55rem;letter-spacing:0.35em;text-transform:uppercase;
+  color:rgba(232,0,26,0.5);font-family:Arial,sans-serif;
+}
+.process-title-row::after{
+  content:'';flex:1;max-width:120px;height:1px;
+  background:linear-gradient(90deg,rgba(232,0,26,0.3),transparent);
+}
+.process-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1px;background:rgba(232,0,26,0.05);
+}
+.process-step{
+  background:var(--surface);
+  padding:1.75rem 1.5rem;
+  position:relative;
+  transition:background 0.15s;
+}
+.process-step:hover{background:var(--surface2);}
+.ps-num{
+  font-size:2rem;font-weight:900;
+  color:rgba(232,0,26,0.08);line-height:1;
+  margin-bottom:0.75rem;
+  font-family:'Arial Black',Arial,sans-serif;
+}
+.ps-accent{
+  width:1.5rem;height:2px;
+  background:linear-gradient(90deg,var(--red),rgba(232,0,26,0.3));
+  margin-bottom:0.75rem;
+}
+.ps-title{
+  font-size:0.85rem;font-weight:900;letter-spacing:0.03em;
+  text-transform:uppercase;color:var(--white);margin-bottom:0.5rem;
+}
+.ps-desc{
+  font-family:Arial,sans-serif;font-weight:400;
+  font-size:0.7rem;line-height:1.65;
+  color:rgba(242,236,224,0.35);
+}
+
+/* STATUS BAR */
+.statusbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:400;
+  height:40px;background:var(--red);
+  clip-path:polygon(0 35%,100% 0%,100% 100%,0% 100%);
+  display:flex;align-items:flex-end;padding:0 3.5rem 0.65rem;
+}
+.sb-hints{
+  display:flex;gap:2rem;
+  font-family:Arial,sans-serif;font-size:0.52rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(0,0,0,0.6);font-weight:700;
+}
+.sb-key{
+  background:rgba(0,0,0,0.2);padding:0.05rem 0.3rem;
+  border-radius:2px;color:rgba(0,0,0,0.75);margin-right:0.3rem;
+}
+
+#flash{
+  position:fixed;inset:0;z-index:950;
+  background:var(--red);opacity:0;pointer-events:none;
+  transition:opacity 0.07s;
+}
+#flash.on{opacity:0.4;}
+
+@media(max-width:768px){
+  .topbar{padding:0 1.5rem;}
+  .hero,.content{padding-left:1.5rem;padding-right:1.5rem;}
+  .ph-top{flex-direction:column;}
+  .ph-stats{flex-direction:row;flex-wrap:wrap;gap:1.5rem;}
+  .ph-actions{padding-left:1.5rem;}
+  .preview-header{padding:1rem 1.5rem;}
+  .preview-frame.proto-view{padding:2rem 1rem;}
+  .phone-shell{width:280px;}
+  .phone-iframe{height:560px;}
+  .preview-frame.blueprint-view{height:400px;}
+  .process-header{padding:1.25rem 1.5rem;}
+  .process-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="flash"></div>
+<div class="scan"></div>
+
+<div class="bg">
+  <canvas id="bgCanvas"></canvas>
+  <div class="hl hl1"></div>
+  <div class="hl hl2"></div>
+</div>
+
+<div class="page">
+
+  <div class="topbar">
+    <a class="back-btn" href="index.html" id="backBtn">← Back</a>
+    <span class="topbar-title">UX / UI Design — Portfolio</span>
+    <span class="topbar-name">JE</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Interface Design</div>
+    <div class="hero-title">
+      <span class="solid">UX / UI</span>
+      <span class="outline">Design</span>
+    </div>
+    <div class="hero-sub">Figma · Prototyping · User Experience</div>
+  </div>
+
+  <div class="content">
+
+    <!-- PROJECT HERO CARD -->
+    <div class="project-hero">
+      <div class="ph-top">
+        <div class="ph-meta">
+          <div class="ph-num">Project 01 / 01</div>
+          <div class="ph-title">APEX</div>
+          <div class="ph-subtitle">Fitness Rewards & Social Platform — UI Concept</div>
+          <div class="ph-desc">
+            A mobile-first UI concept for a fitness app that rewards users for working out and staying active. Features include achievement tracking, sponsor deal integrations, and social interactions between users — designed to make fitness feel less like a chore and more like a game.
+          </div>
+          <div class="ph-tags">
+            <span class="ph-tag">Figma</span>
+            <span class="ph-tag">Mobile UI</span>
+            <span class="ph-tag">UX Design</span>
+            <span class="ph-tag">Prototyping</span>
+            <span class="ph-tag">Concept Project</span>
+          </div>
+        </div>
+        <div class="ph-stats">
+          <div class="stat-item">
+            <div class="stat-val">01</div>
+            <div class="stat-label">Project</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">Figma</div>
+            <div class="stat-label">Tool</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">iOS</div>
+            <div class="stat-label">Platform</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ph-divider"></div>
+
+      <div class="ph-actions">
+        <a class="btn-primary" href="https://www.figma.com/proto/GwopM5cHrOo8a1aW0BMJUW/Untitled?node-id=5-1478&p=f&t=wSkRn8qXgLdJ0KUC-1&scaling=scale-down&content-scaling=fixed&page-id=5%3A1477&starting-point-node-id=5%3A1478" target="_blank">
+          ▶ Open Prototype
+        </a>
+        <a class="btn-secondary" href="https://www.figma.com/design/GwopM5cHrOo8a1aW0BMJUW/Untitled?node-id=5-1477&t=O9u8q7y1byVrNMwk-1" target="_blank">
+          ◈ View Blueprint
+        </a>
+        <span class="btn-note">Opens in Figma</span>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="preview-section">
+      <div class="preview-header">
+        <div class="preview-label">Live Preview</div>
+        <div class="preview-toggle">
+          <div class="ptog active" data-view="proto">Prototype</div>
+          <div class="ptog" data-view="blueprint">Blueprint</div>
+        </div>
+      </div>
+
+      <!-- PROTOTYPE VIEW -->
+      <div class="preview-frame proto-view" id="view-proto">
+        <div class="phone-shell">
+          <div class="phone-notch"></div>
+          <div style="position:relative;">
+            <div class="frame-placeholder" id="proto-placeholder">
+              <div class="fp-spinner"></div>
+              <div class="fp-text">Loading prototype...</div>
+            </div>
+            <iframe
+              class="phone-iframe"
+              id="proto-iframe"
+              src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FGwopM5cHrOo8a1aW0BMJUW%2FUntitled%3Fnode-id%3D5-1478%26p%3Df%26t%3DwSkRn8qXgLdJ0KUC-1%26scaling%3Dscale-down%26content-scaling%3Dfixed%26page-id%3D5%253A1477%26starting-point-node-id%3D5%253A1478"
+              allowfullscreen
+              allow="fullscreen"
+              onload="document.getElementById('proto-placeholder').classList.add('hidden')"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLUEPRINT VIEW -->
+      <div class="preview-frame blueprint-view" id="view-blueprint" style="display:none;">
+        <div style="position:relative;height:100%;">
+          <div class="frame-placeholder" id="blueprint-placeholder">
+            <div class="fp-spinner"></div>
+            <div class="fp-text">Loading blueprint...</div>
+          </div>
+          <iframe
+            class="blueprint-iframe"
+            id="blueprint-iframe"
+            allowfullscreen
+            allow="fullscreen"
+            onload="document.getElementById('blueprint-placeholder').classList.add('hidden')"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROCESS SECTION -->
+    <div class="process-section">
+      <div class="process-header">
+        <div class="process-title-row">Design Process</div>
+      </div>
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="ps-num">01</div>
+          <div class="ps-accent"></div>
+          <div class="ps-title">Research</div>
+          <div class="ps-desc">Analyzed existing fitness apps — identifying gaps in motivation, retention, and reward systems that most platforms fail to address.</div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">02</div>
+          <div class="ps-accent"></div>
+          <div class="ps-title">Concept</div>
+          <div class="ps-desc">Defined the core loop: exercise → earn points → unlock rewards and sponsor deals → share with friends. Gamification as the hook, real value as the retention.</div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">03</div>
+          <div class="ps-accent"></div>
+          <div class="ps-title">Wireframe</div>
+          <div class="ps-desc">Laid out information architecture and user flows in Figma — mapping every screen transition before touching visual design.</div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">04</div>
+          <div class="ps-accent"></div>
+          <div class="ps-title">Visual Design</div>
+          <div class="ps-desc">Applied a bold, energetic visual language with high contrast, clear hierarchy, and motion-forward UI elements suited to an active user context.</div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">05</div>
+          <div class="ps-accent"></div>
+          <div class="ps-title">Prototype</div>
+          <div class="ps-desc">Built an interactive Figma prototype with full screen-to-screen transitions, tap targets, and simulated flows — viewable without any account or install.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <div class="statusbar">
+    <div class="sb-hints">
+      <span><span class="sb-key">Click</span>Interact</span>
+      <span><span class="sb-key">Esc</span>Back</span>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// Cursor
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';
+  cur.style.top=e.clientY+'px';
+});
+
+// Flash
+const flash=document.getElementById('flash');
+function doFlash(cb){
+  flash.classList.add('on');
+  setTimeout(()=>{flash.classList.remove('on');if(cb)cb();},100);
+}
+
+// Back
+document.getElementById('backBtn').addEventListener('click',e=>{
+  e.preventDefault();
+  doFlash(()=>{ window.location.href='index.html'; });
+});
+
+// Preview toggle
+const ptogs=document.querySelectorAll('.ptog');
+const viewProto=document.getElementById('view-proto');
+const viewBlueprint=document.getElementById('view-blueprint');
+const blueprintIframe=document.getElementById('blueprint-iframe');
+let blueprintLoaded=false;
+
+ptogs.forEach(t=>{
+  t.addEventListener('click',()=>{
+    doFlash(()=>{
+      ptogs.forEach(p=>p.classList.remove('active'));
+      t.classList.add('active');
+      if(t.dataset.view==='proto'){
+        viewProto.style.display='flex';
+        viewBlueprint.style.display='none';
+      } else {
+        viewProto.style.display='none';
+        viewBlueprint.style.display='block';
+        // lazy load blueprint iframe only when first switched to
+        if(!blueprintLoaded){
+          blueprintIframe.src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fdesign%2FGwopM5cHrOo8a1aW0BMJUW%2FUntitled%3Fnode-id%3D5-1477%26t%3DO9u8q7y1byVrNMwk-1";
+          blueprintLoaded=true;
+        }
+      }
+    });
+  });
+});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') doFlash(()=>{ window.location.href='index.html'; });
+});
+
+// External links — flash before opening
+document.querySelectorAll('a[target="_blank"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    // let them open naturally, just add flash feel
+    flash.classList.add('on');
+    setTimeout(()=>flash.classList.remove('on'),100);
+  });
+});
+
+// BG Canvas
+(()=>{
+  const canvas=document.getElementById('bgCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const streaks=Array.from({length:16},()=>mkS());
+  function mkS(){
+    const angle=(-15+Math.random()*8)*Math.PI/180;
+    const alpha=0.02+Math.random()*0.04;
+    return{x:Math.random()*1.6*window.innerWidth-0.3*window.innerWidth,y:Math.random()*window.innerHeight,
+      angle,speed:0.1+Math.random()*0.2,len:60+Math.random()*200,alpha,w:0.4+Math.random()*0.8,
+      color:Math.random()<0.75?`rgba(242,236,224,${alpha})`:Math.random()<0.5?`rgba(232,0,26,${alpha*0.8})`:`rgba(100,200,255,${alpha*0.7})`};
+  }
+  function tickS(s){s.x+=Math.cos(s.angle)*s.speed;s.y+=Math.sin(s.angle)*s.speed;if(s.x>W+400)s.x=-400;if(s.y>H+40)s.y=-40;if(s.x<-400)s.x=W+400;}
+  function drawS(s){
+    const ex=s.x+Math.cos(s.angle)*s.len,ey=s.y+Math.sin(s.angle)*s.len;
+    const g=ctx.createLinearGradient(s.x,s.y,ex,ey);
+    g.addColorStop(0,'transparent');g.addColorStop(0.4,s.color);g.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(ex,ey);ctx.strokeStyle=g;ctx.lineWidth=s.w;ctx.stroke();
+  }
+  const geos=Array.from({length:22},()=>mkG());
+  function mkG(){
+    const sides=Math.random()<0.5?3:4;
+    const tier=Math.random();
+    const size=tier<0.30?6+Math.random()*14:tier<0.60?20+Math.random()*40:tier<0.82?60+Math.random()*90:150+Math.random()*150;
+    const alpha=size>120?0.006+Math.random()*0.012:size>50?0.012+Math.random()*0.022:0.025+Math.random()*0.05;
+    const sc=size>100?0.4:size>40?0.7:1.0;
+    const speed={x:(Math.random()-0.5)*0.32*sc,y:(Math.random()-0.5)*0.22*sc,r:(Math.random()-0.5)*0.006*sc};
+    const roll=Math.random();
+    const col=roll<0.50?`rgba(80,80,80,${alpha})`:roll<0.72?`rgba(45,45,45,${alpha})`:roll<0.88?`rgba(232,0,26,${alpha})`:`rgba(150,150,150,${alpha})`;
+    return{x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,size,sides,filled:size>80?false:Math.random()<0.28,speed,col,rot:Math.random()*Math.PI*2};
+  }
+  function tickG(g){
+    g.x+=g.speed.x;g.y+=g.speed.y;g.rot+=g.speed.r;
+    const buf=g.size+20;if(g.x<-buf)g.x=W+buf;if(g.x>W+buf)g.x=-buf;if(g.y<-buf)g.y=H+buf;if(g.y>H+buf)g.y=-buf;
+  }
+  function drawG(g){
+    ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rot);ctx.beginPath();
+    for(let i=0;i<g.sides;i++){const a=(i/g.sides)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*g.size,Math.sin(a)*g.size):ctx.lineTo(Math.cos(a)*g.size,Math.sin(a)*g.size);}
+    ctx.closePath();
+    if(g.filled){ctx.fillStyle=g.col;ctx.fill();}else{ctx.strokeStyle=g.col;ctx.lineWidth=0.5;ctx.stroke();}
+    ctx.restore();
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    streaks.forEach(s=>{tickS(s);drawS(s);});
+    geos.forEach(g=>{tickG(g);drawG(g);});
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
