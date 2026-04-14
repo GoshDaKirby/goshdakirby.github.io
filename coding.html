@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding — Joshua Easo</title>
+<link rel="icon" type="image/png" href="GDK.png">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--red:#e8001a;--black:#080808;--white:#f2ece0;--surface:#0f0f0f;--surface2:#141414;--border:rgba(242,236,224,0.06);}
+html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial Black','Arial Bold',Arial,sans-serif;cursor:none;user-select:none;overflow-x:hidden;}
+#cur{position:fixed;z-index:9999;pointer-events:none;width:10px;height:10px;background:var(--red);transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 8px var(--red);}
+.scan{position:fixed;inset:0;z-index:800;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);}
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;}
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.bg::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(-55deg,transparent 0,transparent 38px,rgba(255,255,255,0.018) 38px,rgba(255,255,255,0.018) 39px);}
+.bg::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(0,0,0,0.75) 100%);}
+.hl{position:absolute;left:-5%;width:110%;height:1px;background:var(--red);z-index:3;}
+.hl1{top:6%;transform:rotate(-2deg);opacity:0.4;box-shadow:0 0 12px var(--red);}
+.hl2{top:6.4%;transform:rotate(-2deg);opacity:0.12;}
+.page{position:relative;z-index:100;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOP BAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;background:rgba(8,8,8,0.95);border-bottom:1px solid rgba(232,0,26,0.15);display:flex;align-items:center;padding:0 2.5rem;gap:2rem;}
+.back-btn{display:flex;align-items:center;gap:0.6rem;font-family:Arial,sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);text-decoration:none;cursor:none;border:1px solid rgba(232,0,26,0.35);padding:0.35rem 0.85rem;transition:background 0.15s;flex-shrink:0;}
+.back-btn:hover{background:rgba(232,0,26,0.1);}
+.topbar-title{font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:rgba(242,236,224,0.3);font-family:Arial,sans-serif;font-weight:400;}
+.topbar-name{margin-left:auto;font-size:1rem;font-weight:900;letter-spacing:0.08em;color:rgba(242,236,224,0.15);text-transform:uppercase;}
+
+/* HERO */
+.hero{padding:6rem 3.5rem 3rem;}
+.hero-eyebrow{font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;color:var(--red);margin-bottom:0.75rem;font-family:Arial,sans-serif;font-weight:400;display:flex;align-items:center;gap:1rem;}
+.hero-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--red);}
+.hero-title{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:-0.02em;line-height:0.95;text-transform:uppercase;}
+.hero-title .solid{display:block;color:var(--white);text-shadow:3px 3px 0 rgba(232,0,26,0.55),6px 6px 0 rgba(0,0,0,0.85);}
+.hero-title .outline{display:block;color:transparent;-webkit-text-stroke:1.5px var(--white);text-shadow:3px 3px 0 rgba(232,0,26,0.25),6px 6px 0 rgba(0,0,0,0.9);margin-top:0.1em;}
+.hero-sub{font-family:Arial,sans-serif;font-weight:400;font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(242,236,224,0.3);margin-top:1.2rem;}
+
+/* CONTENT */
+.content{padding:2.5rem 3.5rem 6rem;display:flex;flex-direction:column;gap:1.5px;}
+
+/* SECTION LABEL */
+.sec-label{font-family:Arial,sans-serif;font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:rgba(232,0,26,0.5);margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem;}
+.sec-label::after{content:'';flex:1;max-width:160px;height:1px;background:linear-gradient(90deg,rgba(232,0,26,0.4),transparent);}
+
+/* ── FEATURED PROJECT CARD ── */
+.featured{background:var(--surface);border:1px solid rgba(232,0,26,0.1);position:relative;overflow:hidden;}
+.featured::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);box-shadow:0 0 12px var(--red);}
+
+.feat-top{padding:2.5rem 2.5rem 0 3rem;display:flex;gap:2.5rem;flex-wrap:wrap;}
+.feat-meta{flex:1;min-width:260px;}
+.feat-num{font-size:0.55rem;letter-spacing:0.15em;color:rgba(232,0,26,0.4);font-family:Arial,sans-serif;margin-bottom:0.5rem;}
+.feat-title{font-size:clamp(1.8rem,3.5vw,3rem);font-weight:900;letter-spacing:-0.01em;text-transform:uppercase;color:var(--white);line-height:1;text-shadow:3px 3px 0 rgba(232,0,26,0.4),5px 5px 0 rgba(0,0,0,0.8);margin-bottom:0.5rem;}
+.feat-subtitle{font-family:Arial,sans-serif;font-weight:400;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.35);margin-bottom:1rem;}
+.feat-desc{font-family:Arial,sans-serif;font-weight:400;font-size:0.8rem;line-height:1.75;color:rgba(242,236,224,0.5);max-width:520px;margin-bottom:1.25rem;}
+.feat-tags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.feat-tag{font-family:Arial,sans-serif;font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.25rem 0.65rem;border:1px solid rgba(232,0,26,0.25);color:rgba(232,0,26,0.45);}
+
+/* lang badges */
+.lang-badges{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;}
+.lang{font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.08em;padding:0.2rem 0.6rem;border-radius:2px;}
+.lang-cs{background:rgba(104,33,122,0.3);color:#c792ea;border:1px solid rgba(104,33,122,0.4);}
+.lang-cpp{background:rgba(0,89,157,0.3);color:#82aaff;border:1px solid rgba(0,89,157,0.4);}
+.lang-kt{background:rgba(127,82,255,0.3);color:#b39ddb;border:1px solid rgba(127,82,255,0.4);}
+.lang-py{background:rgba(53,114,165,0.3);color:#80cbc4;border:1px solid rgba(53,114,165,0.4);}
+.lang-js{background:rgba(189,162,0,0.3);color:#ffcb6b;border:1px solid rgba(189,162,0,0.4);}
+.lang-java{background:rgba(176,58,0,0.3);color:#f78c6c;border:1px solid rgba(176,58,0,0.4);}
+.lang-sql{background:rgba(0,128,96,0.3);color:#80cfa9;border:1px solid rgba(0,128,96,0.4);}
+
+/* FEAT LINKS */
+.feat-actions{padding:1.5rem 2.5rem 1.5rem 3rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;border-top:1px solid rgba(232,0,26,0.07);}
+.btn-primary{font-family:Arial,sans-serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.75rem 1.6rem;background:var(--red);color:rgba(0,0,0,0.85);border:none;cursor:none;font-weight:700;clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);transition:opacity 0.15s,transform 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;}
+.btn-primary:hover{opacity:0.88;transform:translateX(2px);}
+.btn-secondary{font-family:Arial,sans-serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.75rem 1.6rem;background:transparent;border:1px solid rgba(242,236,224,0.2);color:rgba(242,236,224,0.5);cursor:none;clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);transition:border-color 0.15s,color 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;}
+.btn-secondary:hover{border-color:rgba(232,0,26,0.5);color:var(--white);}
+
+/* VIDEO EMBED inside featured card */
+.feat-video{margin:0 3rem 2.5rem;border:1px solid rgba(232,0,26,0.1);position:relative;background:#000;}
+.feat-video-header{padding:0.75rem 1.25rem;border-bottom:1px solid rgba(232,0,26,0.08);display:flex;align-items:center;gap:0.75rem;background:rgba(0,0,0,0.4);}
+.fvh-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);}
+.fvh-label{font-family:Arial,sans-serif;font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(232,0,26,0.5);}
+.feat-video-frame{position:relative;width:100%;aspect-ratio:16/9;}
+.feat-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+
+/* ── TWO-COL GRID for secondary projects ── */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5px;background:rgba(232,0,26,0.06);}
+.proj-card{background:var(--surface);padding:2rem;position:relative;overflow:hidden;transition:background 0.15s;cursor:none;}
+.proj-card:hover{background:var(--surface2);}
+.proj-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);box-shadow:0 0 8px var(--red);transform:scaleY(0);transform-origin:bottom;transition:transform 0.2s cubic-bezier(0.23,1,0.32,1);}
+.proj-card:hover::before{transform:scaleY(1);}
+.pc-num{font-size:0.52rem;letter-spacing:0.15em;color:rgba(232,0,26,0.35);font-family:Arial,sans-serif;margin-bottom:0.5rem;}
+.pc-title{font-size:1.15rem;font-weight:900;text-transform:uppercase;letter-spacing:0.03em;color:var(--white);margin-bottom:0.4rem;text-shadow:1px 1px 0 rgba(232,0,26,0.3);}
+.pc-subtitle{font-family:Arial,sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,236,224,0.3);margin-bottom:1rem;}
+.pc-desc{font-family:Arial,sans-serif;font-weight:400;font-size:0.75rem;line-height:1.7;color:rgba(242,236,224,0.4);margin-bottom:1.25rem;}
+
+/* image thumb inside proj card */
+.pc-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:1.25rem;border:1px solid rgba(232,0,26,0.08);background:#0a0a0a;}
+
+.pc-links{display:flex;gap:0.75rem;flex-wrap:wrap;}
+.pc-link{font-family:Arial,sans-serif;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.4rem 0.9rem;border:1px solid rgba(232,0,26,0.25);color:rgba(232,0,26,0.5);text-decoration:none;cursor:none;display:inline-flex;align-items:center;gap:0.4rem;transition:border-color 0.15s,color 0.15s,background 0.15s;}
+.pc-link:hover{border-color:var(--red);color:var(--white);background:rgba(232,0,26,0.08);}
+
+/* ── LEETCODE SECTION ── */
+.lc-section{background:var(--surface);border:1px solid rgba(232,0,26,0.1);padding:2.5rem 3rem;position:relative;overflow:hidden;}
+.lc-section::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);box-shadow:0 0 12px var(--red);}
+.lc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;flex-wrap:wrap;margin-bottom:2rem;}
+.lc-meta{}
+.lc-title{font-size:1.8rem;font-weight:900;text-transform:uppercase;letter-spacing:0.03em;color:var(--white);text-shadow:2px 2px 0 rgba(232,0,26,0.4),4px 4px 0 rgba(0,0,0,0.8);margin-bottom:0.4rem;}
+.lc-sub{font-family:Arial,sans-serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.3);margin-bottom:1rem;}
+.lc-desc{font-family:Arial,sans-serif;font-size:0.78rem;line-height:1.75;color:rgba(242,236,224,0.45);max-width:460px;}
+.lc-stats{display:flex;flex-direction:column;gap:1rem;align-items:flex-end;}
+.lc-stat-card{background:rgba(0,0,0,0.3);border:1px solid rgba(232,0,26,0.1);padding:0.75rem 1.25rem;text-align:right;}
+.lcs-val{font-size:1.4rem;font-weight:900;color:var(--red);text-shadow:1px 1px 0 rgba(0,0,0,0.8);}
+.lcs-label{font-family:Arial,sans-serif;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,236,224,0.25);}
+
+/* LeetCode live card */
+.lc-cards{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem;}
+.lc-card-img{height:auto;border:1px solid rgba(232,0,26,0.1);display:block;background:#0a0a0a;max-width:100%;}
+
+/* ── MORE COMING SOON block ── */
+.coming-block{background:var(--surface);border:1px solid rgba(232,0,26,0.06);padding:2rem 3rem;display:flex;align-items:center;gap:2rem;}
+.cb-diamond{width:28px;height:28px;border:1px solid rgba(232,0,26,0.4);transform:rotate(45deg);flex-shrink:0;animation:cbpulse 3s ease-in-out infinite;}
+@keyframes cbpulse{0%,100%{box-shadow:0 0 8px rgba(232,0,26,0.1);}50%{box-shadow:0 0 16px rgba(232,0,26,0.35);}}
+.cb-text{font-family:Arial,sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.2);}
+
+/* STATUS BAR */
+.statusbar{position:fixed;bottom:0;left:0;right:0;z-index:400;height:40px;background:var(--red);clip-path:polygon(0 35%,100% 0%,100% 100%,0% 100%);display:flex;align-items:flex-end;padding:0 3.5rem 0.65rem;}
+.sb-hints{display:flex;gap:2rem;font-family:Arial,sans-serif;font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(0,0,0,0.6);font-weight:700;}
+.sb-key{background:rgba(0,0,0,0.2);padding:0.05rem 0.3rem;border-radius:2px;color:rgba(0,0,0,0.75);margin-right:0.3rem;}
+
+#flash{position:fixed;inset:0;z-index:950;background:var(--red);opacity:0;pointer-events:none;transition:opacity 0.07s;}
+#flash.on{opacity:0.4;}
+
+@media(max-width:768px){
+  .topbar{padding:0 1.5rem;}
+  .hero,.content{padding-left:1.5rem;padding-right:1.5rem;}
+  .feat-top{flex-direction:column;}
+  .feat-video{margin:0 1.5rem 2rem;}
+  .feat-actions{padding-left:1.5rem;}
+  .lc-section{padding:2rem 1.5rem;}
+  .lc-top{flex-direction:column;}
+  .lc-stats{align-items:flex-start;flex-direction:row;}
+  .coming-block{padding:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="flash"></div>
+<div class="scan"></div>
+<div class="bg">
+  <canvas id="bgCanvas"></canvas>
+  <div class="hl hl1"></div>
+  <div class="hl hl2"></div>
+</div>
+
+<div class="page">
+
+  <div class="topbar">
+    <a class="back-btn" href="index.html" id="backBtn">← Back</a>
+    <span class="topbar-title">Coding — Portfolio</span>
+    <span class="topbar-name">JE</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Technical Work</div>
+    <div class="hero-title">
+      <span class="solid">Coding</span>
+      <span class="outline">Projects</span>
+    </div>
+    <div class="hero-sub">Unity · Android · Kotlin · Java · Python · C# · C++</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── FEATURED: VR GAMEBOY ── -->
+    <div class="featured">
+      <div class="feat-top">
+        <div class="feat-meta">
+          <div class="feat-num">Featured Project · 01</div>
+          <div class="feat-title">VR Gameboy<br>Emulator</div>
+          <div class="feat-subtitle">Original DMG Emulator · Unity · VR + Desktop</div>
+          <div class="feat-desc">A fully functional Game Boy (DMG) emulator built from scratch in C# and Unity — playable inside a virtual reality environment or on desktop. Implements the Sharp LR35902 CPU instruction set, DMG memory map, ROM loading with MBC support, real-time LCD rendering, and full VR controller input mapping. Solo project built independently without external emulator libraries.</div>
+          <div class="feat-tags">
+            <span class="feat-tag">Solo Project</span>
+            <span class="feat-tag">Unity</span>
+            <span class="feat-tag">VR / Desktop</span>
+            <span class="feat-tag">Hardware Emulation</span>
+            <span class="feat-tag">Systems Programming</span>
+          </div>
+          <div class="lang-badges">
+            <span class="lang lang-cs">C#</span>
+            <span class="lang lang-cpp">C++ concepts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-actions">
+        <a class="btn-primary" href="https://github.com/GoshDaKirby/VRGameboyUnity" target="_blank">⬡ GitHub Repo</a>
+        <a class="btn-secondary" href="https://youtu.be/NCSidNsmnAo" target="_blank">▶ Full Demo</a>
+      </div>
+
+      <div class="feat-video">
+        <div class="feat-video-header">
+          <div class="fvh-dot"></div>
+          <div class="fvh-label">Demo — VR Gameboy Emulator</div>
+        </div>
+        <div class="feat-video-frame">
+          <iframe src="https://www.youtube.com/embed/NCSidNsmnAo?rel=0" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECONDARY PROJECTS GRID ── -->
+    <div class="proj-grid">
+
+      <!-- ANDROID STUDIO -->
+      <div class="proj-card">
+        <div class="pc-num">Project 02</div>
+        <div class="pc-title">Android Studio Labs</div>
+        <div class="pc-subtitle">COMP 322 · Mobile App Development · 9 Labs</div>
+        <img class="pc-thumb" src="ASProjects.png" alt="Android Studio Projects">
+        <div class="pc-desc">A progressive series of 9 Android applications built across a full semester — starting with Kotlin fundamentals and culminating in a multi-screen app with MVVM architecture, Jetpack Compose Navigation, live REST API data via Retrofit, and local Room database persistence. Each lab builds directly on the last.</div>
+        <div class="lang-badges" style="margin-bottom:1.25rem;">
+          <span class="lang lang-kt">Kotlin</span>
+          <span class="lang lang-java">Java</span>
+        </div>
+        <div class="feat-tags" style="margin-bottom:1.25rem;">
+          <span class="feat-tag">Jetpack Compose</span>
+          <span class="feat-tag">MVVM</span>
+          <span class="feat-tag">Retrofit</span>
+          <span class="feat-tag">Room DB</span>
+          <span class="feat-tag">Navigation</span>
+        </div>
+        <div class="pc-links">
+          <a class="pc-link" href="https://github.com/GoshDaKirby/AndriodStudioProjects" target="_blank">⬡ GitHub Repo →</a>
+        </div>
+      </div>
+
+      <!-- LEETCODE -->
+      <div class="proj-card" id="lcCard">
+        <div class="pc-num">Profile · 03</div>
+        <div class="pc-title">LeetCode</div>
+        <div class="pc-subtitle">Algorithms · Data Structures · Problem Solving</div>
+        <div class="pc-desc">Active competitive programming practice covering arrays, hash maps, trees, graphs, dynamic programming, and more. Consistent problem solving as an ongoing discipline — not just for interviews.</div>
+        <div class="lang-badges" style="margin-bottom:1.25rem;">
+          <span class="lang lang-py">Python</span>
+          <span class="lang lang-java">Java</span>
+          <span class="lang lang-cs">C#</span>
+          <span class="lang lang-sql">SQL</span>
+        </div>
+        <div class="lc-cards">
+          <img
+            class="lc-card-img"
+            src="https://leetcard.jacoblin.cool/GoshDaKirby?theme=dark&font=Karma&ext=heatmap&border=0&radius=4"
+            alt="LeetCode stats for GoshDaKirby"
+            onerror="this.style.display='none';document.getElementById('lcFallback').style.display='flex';"
+          >
+          <div id="lcFallback" style="display:none;padding:1.5rem;border:1px solid rgba(232,0,26,0.1);font-family:Arial,sans-serif;font-size:0.65rem;color:rgba(242,236,224,0.3);letter-spacing:0.1em;">
+            Stats load from leetcode.com — visit profile link below
+          </div>
+        </div>
+        <div class="pc-links">
+          <a class="pc-link" href="https://leetcode.com/u/GoshDaKirby" target="_blank">↗ View Profile →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── MORE COMING ── -->
+    <div class="coming-block">
+      <div class="cb-diamond"></div>
+      <div class="cb-text">More projects coming soon — Game Design, additional repos, and open source contributions</div>
+    </div>
+
+  </div><!-- /content -->
+
+  <div class="statusbar">
+    <div class="sb-hints">
+      <span><span class="sb-key">Click</span>Open Links</span>
+      <span><span class="sb-key">Esc</span>Back</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Cursor
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+
+// Flash
+const flash=document.getElementById('flash');
+function doFlash(cb){flash.classList.add('on');setTimeout(()=>{flash.classList.remove('on');if(cb)cb();},100);}
+
+// Back
+document.getElementById('backBtn').addEventListener('click',e=>{e.preventDefault();doFlash(()=>{window.location.href='index.html';});});
+
+// Keyboard
+document.addEventListener('keydown',e=>{if(e.key==='Escape')doFlash(()=>{window.location.href='index.html';});});
+
+// Flash on external links
+document.querySelectorAll('a[target="_blank"]').forEach(a=>{
+  a.addEventListener('click',()=>{flash.classList.add('on');setTimeout(()=>flash.classList.remove('on'),100);});
+});
+
+// BG Canvas
+(()=>{
+  const canvas=document.getElementById('bgCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const streaks=Array.from({length:16},()=>mkS());
+  function mkS(){const angle=(-15+Math.random()*8)*Math.PI/180;const alpha=0.02+Math.random()*0.04;return{x:Math.random()*1.6*window.innerWidth-0.3*window.innerWidth,y:Math.random()*window.innerHeight,angle,speed:0.1+Math.random()*0.2,len:60+Math.random()*200,alpha,w:0.4+Math.random()*0.8,color:Math.random()<0.75?`rgba(242,236,224,${alpha})`:Math.random()<0.5?`rgba(232,0,26,${alpha*0.8})`:`rgba(100,200,255,${alpha*0.7})`};}
+  function tickS(s){s.x+=Math.cos(s.angle)*s.speed;s.y+=Math.sin(s.angle)*s.speed;if(s.x>W+400)s.x=-400;if(s.y>H+40)s.y=-40;if(s.x<-400)s.x=W+400;}
+  function drawS(s){const ex=s.x+Math.cos(s.angle)*s.len,ey=s.y+Math.sin(s.angle)*s.len;const g=ctx.createLinearGradient(s.x,s.y,ex,ey);g.addColorStop(0,'transparent');g.addColorStop(0.4,s.color);g.addColorStop(1,'transparent');ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(ex,ey);ctx.strokeStyle=g;ctx.lineWidth=s.w;ctx.stroke();}
+  const geos=Array.from({length:22},()=>mkG());
+  function mkG(){const sides=Math.random()<0.5?3:4;const tier=Math.random();const size=tier<0.30?6+Math.random()*14:tier<0.60?20+Math.random()*40:tier<0.82?60+Math.random()*90:150+Math.random()*150;const alpha=size>120?0.006+Math.random()*0.012:size>50?0.012+Math.random()*0.022:0.025+Math.random()*0.05;const sc=size>100?0.4:size>40?0.7:1.0;const speed={x:(Math.random()-0.5)*0.32*sc,y:(Math.random()-0.5)*0.22*sc,r:(Math.random()-0.5)*0.006*sc};const roll=Math.random();const col=roll<0.50?`rgba(80,80,80,${alpha})`:roll<0.72?`rgba(45,45,45,${alpha})`:roll<0.88?`rgba(232,0,26,${alpha})`:`rgba(150,150,150,${alpha})`;return{x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,size,sides,filled:size>80?false:Math.random()<0.28,speed,col,rot:Math.random()*Math.PI*2};}
+  function tickG(g){g.x+=g.speed.x;g.y+=g.speed.y;g.rot+=g.speed.r;const buf=g.size+20;if(g.x<-buf)g.x=W+buf;if(g.x>W+buf)g.x=-buf;if(g.y<-buf)g.y=H+buf;if(g.y>H+buf)g.y=-buf;}
+  function drawG(g){ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rot);ctx.beginPath();for(let i=0;i<g.sides;i++){const a=(i/g.sides)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*g.size,Math.sin(a)*g.size):ctx.lineTo(Math.cos(a)*g.size,Math.sin(a)*g.size);}ctx.closePath();if(g.filled){ctx.fillStyle=g.col;ctx.fill();}else{ctx.strokeStyle=g.col;ctx.lineWidth=0.5;ctx.stroke();}ctx.restore();}
+  function frame(){ctx.clearRect(0,0,W,H);streaks.forEach(s=>{tickS(s);drawS(s);});geos.forEach(g=>{tickG(g);drawG(g);});requestAnimationFrame(frame);}
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
