@@ -421,12 +421,12 @@ html,body{
         <div class="mi-text"><div class="mi-label">Game Design</div><div class="mi-sub">Unity · Unreal · C#</div></div>
         <span class="mi-tag">Soon</span>
       </li>
-      <li class="mi" data-action="cs">
+      <li class="mi" data-action="coding">
         <div class="mi-frame"></div><div class="mi-bar"></div>
         <svg class="mi-geo" id="geo3"></svg>
         <span class="mi-num">04</span><div class="mi-arr"></div>
-        <div class="mi-text"><div class="mi-label">Coding</div><div class="mi-sub">Python · JS · SQL · C++</div></div>
-        <span class="mi-tag">Soon</span>
+        <div class="mi-text"><div class="mi-label">Coding</div><div class="mi-sub">Python · JS · SQL · C#</div></div>
+        <span class="mi-tag">Live</span>
       </li>
       <li class="mi" data-action="mediaarts">
         <div class="mi-frame"></div><div class="mi-bar"></div>
@@ -451,8 +451,9 @@ html,body{
       </li>
     </ul>
     <div class="statusbar">
-      <div class="sb-hints">
+      <div class="sb-hints" id="sbHints">
         <span><span class="sb-key">↑↓</span>Navigate</span>
+        <span><span class="sb-key">Tab</span>Cycle</span>
         <span><span class="sb-key">Enter</span>Select</span>
         <span><span class="sb-key">Esc</span>Back</span>
       </div>
@@ -506,11 +507,21 @@ const flash=document.getElementById('flash');
 const items=Array.from(document.querySelectorAll('.mi'));
 let idx=0;
 
+// ── MOBILE DETECTION ──
+// True if touch device OR narrow viewport
+const isMobile=()=>('ontouchstart' in window||navigator.maxTouchPoints>0||window.innerWidth<=900);
+
+// Hide cursor on touch devices
+if('ontouchstart' in window||navigator.maxTouchPoints>0){
+  cur.style.display='none';
+}
+
 document.addEventListener('mousemove',e=>{
   cur.style.left=e.clientX+'px';
   cur.style.top=e.clientY+'px';
 });
 
+// ── MAIN MENU STATE ──
 function setActive(i){
   items.forEach(el=>el.classList.remove('active'));
   items[i].classList.add('active');
@@ -518,17 +529,106 @@ function setActive(i){
   geoSystem.onSelect(i);
 }
 
-items.forEach((el,i)=>el.addEventListener('mouseenter',()=>setActive(i)));
+// Mouse hover — desktop only
+items.forEach((el,i)=>el.addEventListener('mouseenter',()=>{
+  if(!isMobile()) setActive(i);
+}));
 
+// ── CLICK / TAP HANDLER ──
+// Desktop: single click triggers action
+// Mobile: first tap selects (highlights), second tap on already-selected opens
+items.forEach((el,i)=>el.addEventListener('click',()=>{
+  if(isMobile()){
+    if(idx===i && el.classList.contains('active')){
+      // second tap on already-selected item — open it
+      trigger(el.dataset.action);
+    } else {
+      // first tap — just select
+      setActive(i);
+    }
+  } else {
+    // desktop — select + open immediately
+    setActive(i);
+    trigger(el.dataset.action);
+  }
+}));
+
+// ── KEYBOARD NAVIGATION ──
 document.addEventListener('keydown',e=>{
   const anyOpen=document.querySelector('.overlay.open');
-  if(anyOpen){if(e.key==='Escape')closeAll();return;}
+  if(anyOpen){
+    if(e.key==='Escape'){closeAll();return;}
+    // Tab cycles sub-items inside web overlay if open
+    const webOpen=document.getElementById('ovWeb').classList.contains('open');
+    if(webOpen){
+      const subs=Array.from(document.querySelectorAll('.sub-item'));
+      if(e.key==='Tab'){
+        e.preventDefault();
+        const cur=document.querySelector('.sub-item.sub-active');
+        const ci=cur?subs.indexOf(cur):-1;
+        const ni=e.shiftKey?(ci-1+subs.length)%subs.length:(ci+1)%subs.length;
+        subs.forEach(s=>s.classList.remove('sub-active'));
+        subs[ni].classList.add('sub-active');
+        subIdx=ni;
+        return;
+      }
+      if(e.key==='ArrowDown'){e.preventDefault();const subs=Array.from(document.querySelectorAll('.sub-item'));const ci=subs.indexOf(document.querySelector('.sub-item.sub-active'));const ni=Math.min(ci+1,subs.length-1);subs.forEach(s=>s.classList.remove('sub-active'));subs[ni].classList.add('sub-active');subIdx=ni;return;}
+      if(e.key==='ArrowUp'){e.preventDefault();const subs=Array.from(document.querySelectorAll('.sub-item'));const ci=subs.indexOf(document.querySelector('.sub-item.sub-active'));const ni=Math.max(ci-1,0);subs.forEach(s=>s.classList.remove('sub-active'));subs[ni].classList.add('sub-active');subIdx=ni;return;}
+      if(e.key==='Enter'){e.preventDefault();const active=document.querySelector('.sub-item.sub-active');if(active)window.open(active.href,'_blank');return;}
+    }
+    return;
+  }
+  // Main menu navigation
   if(e.key==='ArrowDown'){e.preventDefault();setActive(Math.min(idx+1,items.length-1));}
-  if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(idx-1,0));}
-  if(e.key==='Enter'){e.preventDefault();trigger(items[idx].dataset.action);}
+  else if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(idx-1,0));}
+  else if(e.key==='Tab'){
+    e.preventDefault();
+    // Tab wraps around — Shift+Tab goes backwards
+    const next=e.shiftKey?(idx-1+items.length)%items.length:(idx+1)%items.length;
+    setActive(next);
+  }
+  else if(e.key==='Enter'){e.preventDefault();trigger(items[idx].dataset.action);}
 });
 
-items.forEach(el=>el.addEventListener('click',()=>trigger(el.dataset.action)));
+// ── SUB-ITEM CLICK / TAP (web overlay) ──
+let subIdx=-1;
+document.querySelectorAll('.sub-item').forEach((el,i)=>{
+  // Mouse hover highlights on desktop
+  el.addEventListener('mouseenter',()=>{
+    if(!isMobile()){
+      document.querySelectorAll('.sub-item').forEach(s=>s.classList.remove('sub-active'));
+      el.classList.add('sub-active');
+      subIdx=i;
+    }
+  });
+  // Click/tap handling
+  el.addEventListener('click',e=>{
+    if(isMobile()){
+      const subs=Array.from(document.querySelectorAll('.sub-item'));
+      if(el.classList.contains('sub-active')){
+        // second tap — navigate
+        // let default anchor behavior fire
+      } else {
+        e.preventDefault();
+        subs.forEach(s=>s.classList.remove('sub-active'));
+        el.classList.add('sub-active');
+        subIdx=i;
+        // Show a small hint
+        showSubHint();
+      }
+    }
+    // desktop: default anchor opens in new tab — no override needed
+  });
+});
+
+// Brief hint on mobile first tap in submenu
+function showSubHint(){
+  const label=document.querySelector('.ov-label');
+  if(!label)return;
+  const orig=label.textContent;
+  label.textContent='Tap again to open →';
+  setTimeout(()=>{label.textContent=orig;},1400);
+}
 
 function doFlash(cb){
   flash.classList.add('on');
@@ -537,11 +637,17 @@ function doFlash(cb){
 
 function trigger(action){
   doFlash(()=>{
-    if(action==='webdesign')document.getElementById('ovWeb').classList.add('open');
+    if(action==='webdesign'){
+      // reset sub selection when opening
+      document.querySelectorAll('.sub-item').forEach(s=>s.classList.remove('sub-active'));
+      subIdx=-1;
+      document.getElementById('ovWeb').classList.add('open');
+    }
     else if(action==='linkedin')window.open('https://www.linkedin.com/in/joshua-easo-81b1a7196','_blank');
     else if(action==='github')window.open('https://github.com/GoshDaKirby','_blank');
     else if(action==='mediaarts')window.location.href='media-arts.html';
     else if(action==='uiux')window.location.href='ux-ui.html';
+    else if(action==='coding')window.location.href='coding.html';
     else document.getElementById('ovCS').classList.add('open');
   });
 }
@@ -549,11 +655,21 @@ function trigger(action){
 function closeAll(){
   doFlash(()=>{
     document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.sub-item').forEach(s=>s.classList.remove('sub-active'));
+    subIdx=-1;
   });
 }
 
 document.getElementById('webBack').addEventListener('click',closeAll);
 document.getElementById('csBack').addEventListener('click',closeAll);
+
+// Update status bar hints for mobile
+if(isMobile()){
+  document.getElementById('sbHints').innerHTML=
+    '<span><span class="sb-key">Tap</span>Select</span>'+
+    '<span><span class="sb-key">Tap Again</span>Open</span>'+
+    '<span><span class="sb-key">← Back</span>Return</span>';
+}
 
 /* ── GEOMETRY SYSTEM ── */
 const geoSystem = (() => {
