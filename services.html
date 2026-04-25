@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Solution Enterprises — Services</title>
+  <meta name="description" content="Full-spectrum pharmaceutical quality assurance, clinical documentation improvement, and document scanning services from Best Solution Enterprises." />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .services-tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--white); border-color: var(--muted); }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .pharma-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2px;
+    }
+    .pharma-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 24px 24px;
+      font-size: 0.9rem;
+      color: var(--light);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .pharma-item:hover {
+      border-color: var(--accent);
+      background: #1c1d21;
+    }
+    .pharma-item-num {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--border);
+      line-height: 1;
+      min-width: 32px;
+      transition: color 0.2s;
+    }
+    .pharma-item:hover .pharma-item-num { color: var(--accent); }
+    .pharma-item-text { flex: 1; }
+    .pharma-item-text strong {
+      display: block;
+      color: var(--white);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .pharma-item-text span { color: var(--muted); font-size: 0.82rem; }
+
+    .scanning-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 2px;
+    }
+    .scanning-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--light);
+      transition: all 0.2s;
+    }
+    .scanning-item::before {
+      content: '📄';
+      font-size: 1.2rem;
+    }
+    .scanning-item:hover {
+      border-color: var(--accent);
+      color: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark"></span>BSE</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="cdi.html">CDI</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="links.html">Useful Links</a></li>
+    </ul>
+    <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
+  </nav>
+  <div class="nav-drawer" id="nav-drawer">
+    <a href="index.html">Home</a><a href="cdi.html">CDI</a>
+    <a href="services.html">Services</a><a href="about.html">About Us</a>
+    <a href="contact.html">Contact</a><a href="links.html">Useful Links</a>
+  </div>
+
+  <!-- PAGE HERO -->
+  <section class="hero" style="min-height: 50vh;">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-bg-glow"></div>
+    <p class="hero-eyebrow fade-up">What We Offer</p>
+    <h1 class="fade-up">Our <span>Services</span></h1>
+    <p class="hero-sub fade-up">
+      Healthcare, pharmaceutical, and document management solutions
+      delivered by certified industry experts.
+    </p>
+  </section>
+
+  <!-- SERVICES SECTION -->
+  <section class="section section-alt">
+    <div class="stripe-accent"></div>
+
+    <div class="services-tabs">
+      <button class="tab-btn active" data-tab="pharma">Pharmaceutical</button>
+      <button class="tab-btn" data-tab="healthcare">Healthcare / CDI</button>
+      <button class="tab-btn" data-tab="scanning">Document Scanning</button>
+      <button class="tab-btn" data-tab="software">Software &amp; Tech</button>
+    </div>
+
+    <!-- PHARMA TAB -->
+    <div class="tab-content active" id="tab-pharma">
+      <p class="section-label fade-up">Pharmaceutical Industries</p>
+      <h2 class="section-title fade-up" style="font-size: 2rem; margin-bottom: 12px;">cGMP Quality Assurance</h2>
+      <div class="section-divider fade-up"></div>
+      <p class="fade-up" style="color: var(--muted); max-width: 680px; margin-bottom: 40px; font-size: 0.95rem;">
+        Are you tired of FDA and customer observations? Are you looking to improve your quality system
+        and the knowledge of your quality team? Our pharmaceutical experts will find the best solution — guaranteed.
+      </p>
+      <div class="pharma-grid">
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">01</span>
+          <div class="pharma-item-text"><strong>FDA Submission</strong><span>NDA &amp; ANDA preparation and support</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">02</span>
+          <div class="pharma-item-text"><strong>FDA Mock Audit</strong><span>Pre-inspection readiness assessment</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">03</span>
+          <div class="pharma-item-text"><strong>Complaint Handling</strong><span>Structured resolution processes</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">04</span>
+          <div class="pharma-item-text"><strong>Investigations</strong><span>Root cause analysis and documentation</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">05</span>
+          <div class="pharma-item-text"><strong>CAPA</strong><span>Corrective &amp; preventive action programs</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">06</span>
+          <div class="pharma-item-text"><strong>Employee Training</strong><span>Any cGMP-related training field</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">07</span>
+          <div class="pharma-item-text"><strong>Validations</strong><span>Process, equipment &amp; cleaning</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">08</span>
+          <div class="pharma-item-text"><strong>Creating Contracts</strong><span>Quality agreements &amp; manufacturing contracts</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">09</span>
+          <div class="pharma-item-text"><strong>Internal &amp; External Audit</strong><span>Comprehensive audit programs</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">10</span>
+          <div class="pharma-item-text"><strong>Document Control &amp; GDP</strong><span>Good Documentation Practice systems</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">11</span>
+          <div class="pharma-item-text"><strong>Product Recall</strong><span>Recall strategy and execution support</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">12</span>
+          <div class="pharma-item-text"><strong>Batch Processing</strong><span>Batch record review and optimization</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">13</span>
+          <div class="pharma-item-text"><strong>Annual Product Review</strong><span>APR / PQR preparation</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">14</span>
+          <div class="pharma-item-text"><strong>Adverse Drug Reaction</strong><span>ADR reporting and management</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">15</span>
+          <div class="pharma-item-text"><strong>Change Control &amp; Deviations</strong><span>Controlled change management</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">16</span>
+          <div class="pharma-item-text"><strong>Incoming Raw Material Inspection</strong><span>Supplier quality verification</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">17</span>
+          <div class="pharma-item-text"><strong>Microbial &amp; Environmental Monitoring</strong><span>Facility and equipment compliance</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">18</span>
+          <div class="pharma-item-text"><strong>Risk Management</strong><span>ICH Q9-based risk frameworks</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">19</span>
+          <div class="pharma-item-text"><strong>Project Management</strong><span>Cross-functional project leadership</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">20</span>
+          <div class="pharma-item-text"><strong>Production &amp; Packaging Overview</strong><span>Operational quality review</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">21</span>
+          <div class="pharma-item-text"><strong>Creating &amp; Implementing SOPs</strong><span>Standard operating procedure development</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">22</span>
+          <div class="pharma-item-text"><strong>Qualifying Suppliers / Vendors</strong><span>Audit and qualification programs</span></div>
+        </div>
+        <div class="pharma-item fade-up">
+          <span class="pharma-item-num">23</span>
+          <div class="pharma-item-text"><strong>cGMP Regulation Implementation</strong><span>End-to-end compliance programs</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEALTHCARE TAB -->
+    <div class="tab-content" id="tab-healthcare">
+      <p class="section-label fade-up">Healthcare Industries</p>
+      <h2 class="section-title fade-up" style="font-size: 2rem; margin-bottom: 12px;">Clinical Documentation</h2>
+      <div class="section-divider fade-up"></div>
+      <p class="fade-up" style="color: var(--muted); max-width: 680px; margin-bottom: 40px; font-size: 0.95rem;">
+        Please contact one of our Certified Clinical Document Specialists / RNs for expert advice
+        related to documentation improvement and coding. Agency CDI Nurses are also available for PRN CDI needs.
+      </p>
+      <div class="card-grid">
+        <div class="card fade-up">
+          <span class="card-icon">📋</span>
+          <h3>Clinical Documentation Improvement</h3>
+          <p>Ensuring that medical records accurately reflect the true severity of illness and complexity of care provided — maximizing appropriate reimbursement.</p>
+        </div>
+        <div class="card fade-up">
+          <span class="card-icon">👩‍⚕️</span>
+          <h3>Agency / PRN CDI Nurse</h3>
+          <p>Certified CDI Nurses available for agency placement and PRN (as-needed) engagements across healthcare facilities.</p>
+        </div>
+        <div class="card fade-up">
+          <span class="card-icon">💬</span>
+          <h3>Expert Coding Advice</h3>
+          <p>Guidance on ICD-10-CM/PCS coding queries, physician query processes, and documentation education programs.</p>
+        </div>
+      </div>
+      <div style="margin-top: 40px;" class="fade-up">
+        <a href="cdi.html" class="btn btn-outline">Learn More About CDI →</a>
+      </div>
+    </div>
+
+    <!-- SCANNING TAB -->
+    <div class="tab-content" id="tab-scanning">
+      <p class="section-label fade-up">Document Scanning</p>
+      <h2 class="section-title fade-up" style="font-size: 2rem; margin-bottom: 12px;">On-Site or Off-Site Digitization</h2>
+      <div class="section-divider fade-up"></div>
+      <p class="fade-up" style="color: var(--muted); max-width: 680px; margin-bottom: 40px; font-size: 0.95rem;">
+        Do you have a large volume of important documents you would like to preserve forever?
+        We can convert all your records into secure electronic files you can access anywhere.
+      </p>
+      <div class="scanning-items">
+        <div class="scanning-item fade-up">Medical Charts &amp; Hospital / Practice Files</div>
+        <div class="scanning-item fade-up">Student Records</div>
+        <div class="scanning-item fade-up">District &amp; County Clerk Court Documents</div>
+        <div class="scanning-item fade-up">Birth, Death &amp; Marriage Certificates</div>
+        <div class="scanning-item fade-up">Human Resource Files</div>
+        <div class="scanning-item fade-up">Accounts Payable &amp; Accounting Files</div>
+        <div class="scanning-item fade-up">Bank, Broker-Dealer &amp; Mortgage Files</div>
+        <div class="scanning-item fade-up">Engineering &amp; Architectural Renderings &amp; Drawings</div>
+        <div class="scanning-item fade-up">Insurance Applications and Claims</div>
+      </div>
+    </div>
+    <!-- SOFTWARE TAB -->
+    <div class="tab-content" id="tab-software">
+      <p class="section-label fade-up">Software &amp; Technology</p>
+      <h2 class="section-title fade-up" style="font-size:2rem;margin-bottom:12px;">Software Consulting &amp; Development</h2>
+      <div class="section-divider fade-up"></div>
+      <p class="fade-up" style="color:var(--muted);max-width:680px;margin-bottom:40px;font-size:0.95rem;">
+        BSE now offers software consulting, automation, and technology integration services —
+        delivered by a certified software engineer with full-stack, cloud, data, and AI capabilities.
+        Whether you need a process automated, a tool built, or a tech stack evaluated, we find the best solution.
+      </p>
+
+      <div class="software-section fade-up">
+        <div class="sw-header">
+          <div class="sw-avatar">&#128187;</div>
+          <div>
+            <h3>Joshua Easo</h3>
+            <p class="sw-title">Software Consultant &amp; Project Coordinator — B.S. Computer Science, ONU 2025</p>
+          </div>
+        </div>
+        <div class="card-grid" style="margin-top:0;">
+          <div class="card fade-up">
+            <span class="card-icon">&#127760;</span>
+            <h3>Web &amp; Full-Stack</h3>
+            <p>End-to-end web applications, REST API design and integration, front-end interfaces, and scripting automation using JavaScript, Python, HTML/CSS, and Google Apps Script.</p>
+          </div>
+          <div class="card fade-up">
+            <span class="card-icon">&#9729;&#65039;</span>
+            <h3>Cloud &amp; Data</h3>
+            <p>Cloud application deployment on AWS and Azure, ETL/ELT pipeline design, Big Data processing, SQL database design and administration, and data transformation workflows.</p>
+          </div>
+          <div class="card fade-up">
+            <span class="card-icon">&#128241;</span>
+            <h3>Mobile Development</h3>
+            <p>Android applications using Kotlin and Jetpack Compose — MVVM architecture, multi-screen navigation, REST API integration (Retrofit/Firebase), and local database (Room).</p>
+          </div>
+          <div class="card fade-up">
+            <span class="card-icon">&#129302;</span>
+            <h3>AI &amp; Automation</h3>
+            <p>Practical AI integration using Claude, ChatGPT, and GitHub Copilot on real deliverables — workflow automation, coding agent direction, and AI-assisted process improvement.</p>
+          </div>
+          <div class="card fade-up">
+            <span class="card-icon">&#128202;</span>
+            <h3>Systems &amp; Security</h3>
+            <p>Systems programming, OS internals, cryptography, digital systems security, network technologies, and system administration in enterprise IT environments.</p>
+          </div>
+          <div class="card fade-up">
+            <span class="card-icon">&#128295;</span>
+            <h3>Project Coordination</h3>
+            <p>Agile methodologies, Git-based DevOps workflows, technical documentation, cross-functional team coordination, and clear communication with non-technical stakeholders.</p>
+          </div>
+        </div>
+
+        <div style="margin-top:36px;padding-top:28px;border-top:1px solid var(--border);">
+          <p class="section-label" style="margin-bottom:14px;">Technical Stack</p>
+          <div class="tech-tags">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Java</span>
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">Kotlin</span>
+            <span class="tech-tag">C#</span>
+            <span class="tech-tag">C++</span>
+            <span class="tech-tag">SQL</span>
+            <span class="tech-tag">HTML / CSS</span>
+            <span class="tech-tag">AWS</span>
+            <span class="tech-tag">Azure</span>
+            <span class="tech-tag">Android / Jetpack</span>
+            <span class="tech-tag">Unity</span>
+            <span class="tech-tag">Unreal Engine</span>
+            <span class="tech-tag">Git / DevOps</span>
+            <span class="tech-tag">Firebase</span>
+            <span class="tech-tag">Retrofit / REST</span>
+            <span class="tech-tag">ETL Pipelines</span>
+            <span class="tech-tag">Big Data</span>
+            <span class="tech-tag">Figma</span>
+            <span class="tech-tag">Claude / Copilot / ChatGPT</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:40px;" class="fade-up">
+        <a href="about.html" class="btn btn-outline">Meet Joshua →</a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="text-align:center;">
+    <p class="section-label fade-up" style="justify-content:center;">Get Started</p>
+    <h2 class="section-title fade-up" style="margin: 0 auto 24px;">Request a Free Consultation</h2>
+    <div class="fade-up" style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:24px;">
+      <a href="contact.html" class="btn btn-primary">Contact Us</a>
+      <a href="about.html" class="btn btn-outline">Meet the Team</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="logo-mark"></span>Best Solution Enterprises, LLC</div>
+        <p class="footer-tagline">Pharmaceutical &amp; healthcare consulting excellence.</p>
+      </div>
+      <div class="footer-nav-col">
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li><li><a href="cdi.html">CDI</a></li>
+          <li><a href="services.html">Services</a></li><li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li><li><a href="links.html">Useful Links</a></li>
+        </ul>
+      </div>
+      <div class="footer-nav-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+12244338031">(224) 433-8031</a></li>
+          <li><a href="tel:+12247233248">(224) 723-3248</a></li>
+          <li><a href="mailto:president@bestsolutionenterprises.com">Email Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Best Solution Enterprises, LLC. All rights reserved.</p>
+      <p class="footer-copy">1 N. O'Plaine Rd, #406, Gurnee, IL 60031</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
