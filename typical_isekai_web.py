@@ -189,7 +189,8 @@ def learnmove():
             while nolearn.lower() != 'y' and nolearn.lower() != 'yes':
                 yield from delay_print('You are trying to learn {} but your skill slots are full...\n'.format(learnAtk), 0.075)
                 print('Current Moves: \n1. {}\n2. {}\n3. {}\n4. {}'.format(magicAbil[0], magicAbil[1], magicAbil[2], magicAbil[3]))
-                forget = (yield ('input', 'Replace which slot with {}? (1-4 or 0 if not desired): '.format(learnAtk)))
+                print('Replace which slot with {}? (1-4 or 0 if not desired): '.format(learnAtk))
+                forget = (yield ('input', ''))
                 try:
                     forget = int(forget)
                     checkVal = True
@@ -202,7 +203,8 @@ def learnmove():
                     yield ('sleep', 2)
                     nolearn = 'Y'
                 else:
-                    nolearn = (yield ('input', "Are you sure you don't want to learn {}?(Y/N): ".format(learnAtk)))
+                    print("Are you sure you don't want to learn {}?(Y/N): ".format(learnAtk))
+                    nolearn = (yield ('input', ''))
                     yield from delay_print("You didn't learn {}.".format(learnAtk), 0.075)
                     yield ('sleep', 2)
     else:
@@ -583,9 +585,11 @@ def battle():
         print('\nPlayer Health: {}/{}'.format(health, maxHealth))
         print('Enemy Health: {}/{}'.format(enemyHealth, enemyMaxHealth))
         if tame < 1:
-            choice = (yield ('input', 'What will you do? (Attack, Magic, Action, Item, Run, *Befriend*): '))
+            print('What will you do? (Attack, Magic, Action, Item, Run, *Befriend*): ')
+            choice = (yield ('input', ''))
         else:
-            choice = (yield ('input', 'What will you do? (Attack, Magic, Action, Item, Run, BEFRIEND): '))
+            print('What will you do? (Attack, Magic, Action, Item, Run, BEFRIEND): ')
+            choice = (yield ('input', ''))
         clean()
         printEnemy()
         if choice.lower() == 'attack' and (enemy != 'Wolf Pup' or armor == 'SnoGoggles'):
@@ -2560,7 +2564,8 @@ def GodBattle():
                 print(item, end='')
             else:
                 print(item, end=', ')
-        choice = (yield ('input', '): '))
+        print('): ')
+        choice = (yield ('input', ''))
         clean()
         printEnemy()
         if choice.lower() == 'attack':
@@ -3316,9 +3321,11 @@ def _main():
     clean()
     yield ('sleep', 1)
     print("**Developer's note:\nDon't spam 'Enter' at any time, Python takes it as an input and will skip through choices and mess up text!\nIf you wish to disable delayed text, change speed multiplier to '0' in settings.")
-    yield ('input', "Press 'Enter' to continue: ")
+    print("Press 'Enter' to continue: ")
+    yield ('input', '')
     clean()
-    play = (yield ('input', 'Ready to begin your adventure?(Y/N): '))
+    print('Ready to begin your adventure?(Y/N): ')
+    play = (yield ('input', ''))
     while play != 'N' and play != 'n' and (play != 'No') and (play != 'no'):
         clean()
         if play.lower() == 'load':
