@@ -28,13 +28,13 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
 
 /* TERMINAL */
 .content{padding:0 3.5rem 3rem;flex:1;display:flex;flex-direction:column;}
-.term-wrap{background:#000;border:1px solid rgba(232,0,26,0.15);position:relative;flex:1;display:flex;flex-direction:column;min-height:60vh;}
+.term-wrap{background:#000;border:1px solid rgba(232,0,26,0.15);position:relative;flex:1;display:flex;flex-direction:column;min-height:80vh;}
 .term-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);box-shadow:0 0 12px var(--red);}
 .term-header{padding:0.65rem 1.25rem;border-bottom:1px solid rgba(232,0,26,0.08);display:flex;align-items:center;gap:0.75rem;background:rgba(0,0,0,0.4);}
 .term-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);}
 .term-label{font-family:Arial,sans-serif;font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(232,0,26,0.5);}
 .term-status{margin-left:auto;font-family:Arial,sans-serif;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,236,224,0.3);}
-#term-output{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;font-family:'Courier New',monospace;font-size:0.78rem;line-height:1.4;color:#d7d0c4;white-space:pre-wrap;word-break:break-word;max-height:60vh;}
+#term-output{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;font-family:'Courier New',monospace;font-size:0.78rem;line-height:1.4;color:#d7d0c4;white-space:pre-wrap;word-break:break-word;max-height:75vh;}
 .term-input-row{display:flex;border-top:1px solid rgba(232,0,26,0.1);}
 .term-prompt{padding:0.85rem 0.5rem 0.85rem 1.25rem;font-family:'Courier New',monospace;color:var(--red);font-size:0.85rem;user-select:none;}
 #term-input{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-family:'Courier New',monospace;font-size:0.85rem;padding:0.85rem 1.25rem 0.85rem 0;}
@@ -215,7 +215,7 @@ inputEl.addEventListener('keydown', (e) => {
     const val = inputEl.value;
     inputEl.value = '';
     inputEl.disabled = true;
-    inputEl.placeholder = 'Waiting for game to start…';
+    inputEl.placeholder = 'Waiting for game…';
     const r = resolveInput;
     resolveInput = null;
     r(val);
