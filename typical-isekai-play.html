@@ -223,9 +223,13 @@ inputEl.addEventListener('keydown', (e) => {
 });
 
 function waitForInput(prompt) {
+  if (prompt) {
+    rawLog += prompt;
+    render();
+  }
   statusEl.textContent = 'Waiting for input';
   inputEl.disabled = false;
-  inputEl.placeholder = prompt && prompt.trim() ? '' : 'Press Enter to continue…';
+  inputEl.placeholder = 'Type your answer…';
   inputEl.focus();
   return new Promise((resolve) => { resolveInput = resolve; });
 }
