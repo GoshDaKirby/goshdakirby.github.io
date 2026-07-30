@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typical Isekai — Play — Joshua Easo</title>
+<link rel="icon" type="image/png" href="GDK.png">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--red:#e8001a;--black:#080808;--white:#f2ece0;--surface:#0f0f0f;--surface2:#141414;--border:rgba(242,236,224,0.06);}
+html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial Black','Arial Bold',Arial,sans-serif;overflow-x:hidden;}
+.scan{position:fixed;inset:0;z-index:800;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);}
+.page{position:relative;z-index:100;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOP BAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;background:rgba(8,8,8,0.95);border-bottom:1px solid rgba(232,0,26,0.15);display:flex;align-items:center;padding:0 2.5rem;gap:2rem;}
+.back-btn{display:flex;align-items:center;gap:0.6rem;font-family:Arial,sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);text-decoration:none;border:1px solid rgba(232,0,26,0.35);padding:0.35rem 0.85rem;transition:background 0.15s;flex-shrink:0;}
+.back-btn:hover{background:rgba(232,0,26,0.1);}
+.topbar-title{font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:rgba(242,236,224,0.3);font-family:Arial,sans-serif;font-weight:400;}
+.topbar-name{margin-left:auto;font-size:1rem;font-weight:900;letter-spacing:0.08em;color:rgba(242,236,224,0.15);text-transform:uppercase;}
+
+/* HERO */
+.hero{padding:6rem 3.5rem 1.5rem;}
+.hero-eyebrow{font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;color:var(--red);margin-bottom:0.75rem;font-family:Arial,sans-serif;font-weight:400;display:flex;align-items:center;gap:1rem;}
+.hero-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--red);}
+.hero-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-0.02em;line-height:0.95;text-transform:uppercase;color:var(--white);text-shadow:3px 3px 0 rgba(232,0,26,0.55),6px 6px 0 rgba(0,0,0,0.85);}
+.hero-sub{font-family:Arial,sans-serif;font-weight:400;font-size:0.68rem;letter-spacing:0.15em;color:rgba(242,236,224,0.35);margin-top:0.9rem;max-width:640px;line-height:1.6;}
+
+/* TERMINAL */
+.content{padding:0 3.5rem 3rem;flex:1;display:flex;flex-direction:column;}
+.term-wrap{background:#000;border:1px solid rgba(232,0,26,0.15);position:relative;flex:1;display:flex;flex-direction:column;min-height:60vh;}
+.term-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);box-shadow:0 0 12px var(--red);}
+.term-header{padding:0.65rem 1.25rem;border-bottom:1px solid rgba(232,0,26,0.08);display:flex;align-items:center;gap:0.75rem;background:rgba(0,0,0,0.4);}
+.term-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);}
+.term-label{font-family:Arial,sans-serif;font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(232,0,26,0.5);}
+.term-status{margin-left:auto;font-family:Arial,sans-serif;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,236,224,0.3);}
+#term-output{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;font-family:'Courier New',monospace;font-size:0.78rem;line-height:1.4;color:#d7d0c4;white-space:pre-wrap;word-break:break-word;max-height:60vh;}
+.term-input-row{display:flex;border-top:1px solid rgba(232,0,26,0.1);}
+.term-prompt{padding:0.85rem 0.5rem 0.85rem 1.25rem;font-family:'Courier New',monospace;color:var(--red);font-size:0.85rem;user-select:none;}
+#term-input{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-family:'Courier New',monospace;font-size:0.85rem;padding:0.85rem 1.25rem 0.85rem 0;}
+#term-input:disabled{color:rgba(242,236,224,0.2);}
+.term-hint{padding:0.5rem 1.25rem;font-family:Arial,sans-serif;font-size:0.55rem;letter-spacing:0.1em;color:rgba(242,236,224,0.25);border-top:1px solid rgba(232,0,26,0.05);}
+
+/* boot overlay */
+#boot{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:5;}
+#boot.hidden{display:none;}
+.boot-diamond{width:22px;height:22px;border:1px solid rgba(232,0,26,0.5);transform:rotate(45deg);animation:bootpulse 1.2s ease-in-out infinite;}
+@keyframes bootpulse{0%,100%{box-shadow:0 0 8px rgba(232,0,26,0.2);}50%{box-shadow:0 0 18px rgba(232,0,26,0.6);}}
+.boot-text{font-family:Arial,sans-serif;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.4);}
+
+@media(max-width:768px){
+  .topbar{padding:0 1.5rem;}
+  .hero,.content{padding-left:1.5rem;padding-right:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="scan"></div>
+
+<div class="page">
+
+  <div class="topbar">
+    <a class="back-btn" href="game-design.html" id="backBtn">← Back</a>
+    <span class="topbar-title">Typical Isekai — Play in Browser</span>
+    <span class="topbar-name">JE</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Game Development</div>
+    <div class="hero-title">Typical Isekai</div>
+    <div class="hero-sub">Running entirely client-side in your browser via Pyodide (Python compiled to WebAssembly) — the original Python source, unmodified in logic, adapted only so blocking input/typewriter calls cooperate with the browser instead of a terminal.</div>
+  </div>
+
+  <div class="content">
+    <div class="term-wrap">
+      <div id="boot">
+        <div class="boot-diamond"></div>
+        <div class="boot-text" id="boot-text">Loading Python runtime…</div>
+      </div>
+      <div class="term-header">
+        <div class="term-dot"></div>
+        <div class="term-label">Typical Isekai — Console</div>
+        <div class="term-status" id="term-status">Booting</div>
+      </div>
+      <div id="term-output"></div>
+      <div class="term-input-row">
+        <span class="term-prompt">&gt;</span>
+        <input id="term-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" disabled placeholder="Waiting for game to start…">
+      </div>
+      <div class="term-hint">Answers are case-sensitive where the game says so. Press Enter to submit.</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const outputEl = document.getElementById('term-output');
+const inputEl = document.getElementById('term-input');
+const statusEl = document.getElementById('term-status');
+const bootEl = document.getElementById('boot');
+const bootTextEl = document.getElementById('boot-text');
+
+// --- raw output buffer + ANSI-aware renderer ---
+let rawLog = "";           // everything ever written to stdout, in order
+let lastClearIndex = 0;    // index into rawLog after the most recent clear-screen sequence
+
+const decoder = new TextDecoder('utf-8');
+let byteBuf = [];
+
+function flushBytesToLog() {
+  if (byteBuf.length === 0) return;
+  const arr = new Uint8Array(byteBuf);
+  byteBuf = [];
+  rawLog += decoder.decode(arr, { stream: true });
+}
+
+const ANSI_FG = {30:'#000',31:'#e8001a',32:'#5fbf5f',33:'#d7c34a',34:'#5f8fd7',35:'#c792ea',36:'#5fd7d7',37:'#f2ece0',
+                 90:'#666',91:'#ff5c5c',92:'#7dff7d',93:'#ffe066',94:'#7daaff',95:'#e0a3ff',96:'#7dffff',97:'#ffffff'};
+const ANSI_BG = {40:'#000',41:'#e8001a',42:'#5fbf5f',43:'#d7c34a',44:'#5f8fd7',45:'#c792ea',46:'#5fd7d7',47:'#f2ece0',
+                  100:'#666',101:'#ff5c5c',102:'#7dff7d',103:'#ffe066',104:'#7daaff',105:'#e0a3ff',106:'#7dffff',107:'#ffffff'};
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Re-render everything since the last clear-screen sequence, interpreting
+// SGR color codes and \x1bc / \x1b[2J clear-screen sequences.
+function render() {
+  const text = rawLog.slice(lastClearIndex);
+  let html = '';
+  let fg = null, bg = null;
+  let i = 0;
+  let openSpan = false;
+  function openIfNeeded() {
+    if (!openSpan && (fg || bg)) {
+      let style = '';
+      if (fg) style += 'color:' + fg + ';';
+      if (bg) style += 'background:' + bg + ';';
+      html += '<span style="' + style + '">';
+      openSpan = true;
+    }
+  }
+  function closeIfOpen() {
+    if (openSpan) { html += '</span>'; openSpan = false; }
+  }
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '\x1b') {
+      // clear-screen: ESC c   OR   ESC [ 2 J/j
+      // (in practice absorbClears() already consumes any clear sequences
+      // before render() runs, but handle defensively just in case)
+      if (text[i+1] === 'c') {
+        html = ''; fg = null; bg = null; openSpan = false;
+        i += 2;
+        continue;
+      }
+      const m = /^\x1b\[(\d*)([Jj])/.exec(text.slice(i));
+      if (m) {
+        html = ''; fg = null; bg = null; openSpan = false;
+        i += m[0].length;
+        continue;
+      }
+      const sgr = /^\x1b\[([0-9;]*)m/.exec(text.slice(i));
+      if (sgr) {
+        closeIfOpen();
+        const codes = sgr[1].length ? sgr[1].split(';').map(Number) : [0];
+        for (const c of codes) {
+          if (c === 0) { fg = null; bg = null; }
+          else if (ANSI_FG[c]) fg = ANSI_FG[c];
+          else if (ANSI_BG[c]) bg = ANSI_BG[c];
+        }
+        openIfNeeded();
+        i += sgr[0].length;
+        continue;
+      }
+      // unrecognized escape, drop just the ESC char
+      i += 1;
+      continue;
+    }
+    openIfNeeded();
+    html += escapeHtml(ch);
+    i += 1;
+  }
+  closeIfOpen();
+  outputEl.innerHTML = html;
+  outputEl.scrollTop = outputEl.scrollHeight;
+}
+
+// Track clears properly: since we re-slice from rawLog each time using
+// lastClearIndex as an offset into rawLog, find clear sequences within the
+// unrendered tail and advance the offset past the last one found.
+function absorbClears() {
+  const tail = rawLog.slice(lastClearIndex);
+  let idx = -1;
+  let m;
+  const re = /\x1bc|\x1b\[\d*[Jj]/g;
+  while ((m = re.exec(tail)) !== null) {
+    idx = m.index + m[0].length;
+  }
+  if (idx >= 0) lastClearIndex += idx;
+}
+
+function pump() {
+  flushBytesToLog();
+  absorbClears();
+  render();
+}
+
+// --- input handling ---
+let resolveInput = null;
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && resolveInput) {
+    const val = inputEl.value;
+    inputEl.value = '';
+    inputEl.disabled = true;
+    inputEl.placeholder = 'Waiting for game to start…';
+    const r = resolveInput;
+    resolveInput = null;
+    r(val);
+  }
+});
+
+function waitForInput(prompt) {
+  statusEl.textContent = 'Waiting for input';
+  inputEl.disabled = false;
+  inputEl.placeholder = prompt && prompt.trim() ? '' : 'Press Enter to continue…';
+  inputEl.focus();
+  return new Promise((resolve) => { resolveInput = resolve; });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function main() {
+  bootTextEl.textContent = 'Loading Python runtime…';
+  const pyodide = await loadPyodide();
+
+  pyodide.setStdout({ raw: (byte) => { byteBuf.push(byte); } });
+  pyodide.setStderr({ raw: (byte) => { byteBuf.push(byte); } });
+
+  bootTextEl.textContent = 'Loading game code…';
+  const resp = await fetch('./typical_isekai_web.py');
+  const code = await resp.text();
+  pyodide.runPython(code);
+
+  bootEl.classList.add('hidden');
+  statusEl.textContent = 'Running';
+
+  const mainFn = pyodide.globals.get('_main');
+  const gen = mainFn();
+
+  let result = gen.next();
+  while (!result.done) {
+    pump();
+    const v = result.value;
+    const [kind, payload] = (v && typeof v.toJs === 'function') ? v.toJs() : v;
+    if (kind === 'sleep') {
+      await sleep(Math.max(0, payload) * 1000);
+      result = gen.next();
+    } else if (kind === 'input') {
+      const answer = await waitForInput(payload);
+      result = gen.next(answer);
+    } else {
+      result = gen.next();
+    }
+  }
+  pump();
+  statusEl.textContent = 'Game ended';
+  inputEl.disabled = true;
+  inputEl.placeholder = 'The game has ended.';
+}
+
+main().catch((err) => {
+  bootTextEl.textContent = 'Failed to load: ' + err;
+  console.error(err);
+});
+</script>
+</body>
+</html>
