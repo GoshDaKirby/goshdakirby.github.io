@@ -82,6 +82,15 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
 .feat-video-frame{position:relative;width:100%;aspect-ratio:16/9;}
 .feat-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
 
+
+/* SCREENSHOT STRIP */
+.shot-strip{margin:0 3rem 2.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:rgba(232,0,26,0.08);border:1px solid rgba(232,0,26,0.1);}
+.shot{position:relative;background:#000;overflow:hidden;}
+.shot img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;image-rendering:pixelated;transition:transform 0.3s cubic-bezier(0.23,1,0.32,1);}
+.shot:hover img{transform:scale(1.04);}
+.shot-cap{position:absolute;left:0;bottom:0;font-family:Arial,sans-serif;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.75);background:rgba(8,8,8,0.85);padding:0.3rem 0.7rem;border-top:1px solid rgba(232,0,26,0.3);border-right:1px solid rgba(232,0,26,0.3);}
+.feat-note{font-family:Arial,sans-serif;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(242,236,224,0.3);}
+
 /* ── TWO-COL GRID for secondary projects ── */
 .proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5px;background:rgba(232,0,26,0.06);}
 .proj-card{background:var(--surface);padding:2rem;position:relative;overflow:hidden;transition:background 0.15s;cursor:none;}
@@ -146,6 +155,7 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
   .hero,.content{padding-left:1.5rem;padding-right:1.5rem;}
   .feat-top{flex-direction:column;}
   .feat-video{margin:0 1.5rem 2rem;}
+  .shot-strip{margin:0 1.5rem 2rem;grid-template-columns:1fr;}
   .feat-actions{padding-left:1.5rem;}
   .lc-section{padding:2rem 1.5rem;}
   .lc-top{flex-direction:column;}
@@ -212,12 +222,49 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
       </div>
     </div>
 
+
+    <!-- ── FEATURED: UNDERTALEWEB ── -->
+    <div class="featured">
+      <div class="feat-top">
+        <div class="feat-meta">
+          <div class="feat-num">Featured Project · 02</div>
+          <div class="feat-title">Undertale<br>Web</div>
+          <div class="feat-subtitle">GameMaker to Browser Port · Custom JS Runtime · GML Translator</div>
+          <div class="feat-desc">A from-scratch browser port of Undertale (Toby Fox, 2015), built from a decompiled GameMaker project. Instead of hand-rewriting around 137,000 lines of GML, I built a GML-to-JavaScript translator and a GameMaker-compatible runtime covering drawing, input, audio, paths, saves and built-in functions. The whole game runs in plain HTML and JavaScript with no server.</div>
+          <div class="feat-desc">Most of the work was hunting down decompiler damage: reversed switch-case labels, dropped parentheses, inverted guards, lost sprite offsets and hundreds of misidentified object, sprite and sound references. Each fix is recorded in a data-driven patch layer and checked with headless Playwright sweeps that screenshot every room and battle. It also has mobile touch controls and save export/import.</div>
+          <div class="feat-tags">
+            <span class="feat-tag">Engine Port</span>
+            <span class="feat-tag">Source-to-Source Compiler</span>
+            <span class="feat-tag">Reverse Engineering</span>
+            <span class="feat-tag">Automated Testing</span>
+            <span class="feat-tag">Touch Controls</span>
+          </div>
+          <div class="lang-badges">
+            <span class="lang lang-js">JavaScript</span>
+            <span class="lang lang-js">Node.js</span>
+            <span class="lang lang-cs">GML</span>
+            <span class="lang lang-sql">Playwright</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="shot-strip">
+        <div class="shot"><img src="utweb-start.png" alt="UndertaleWeb boot screen with controls and save export/import" loading="lazy"><span class="shot-cap">Boot · Save Tools</span></div>
+        <div class="shot"><img src="utweb-load.png" alt="Undertale load screen running in the browser" loading="lazy"><span class="shot-cap">Load Screen</span></div>
+        <div class="shot"><img src="utweb-snowdin.png" alt="Snowdin Town gameplay in the browser port" loading="lazy"><span class="shot-cap">Snowdin Town</span></div>
+      </div>
+
+      <div class="feat-actions">
+        <span class="feat-note">Private build · Undertale is © Toby Fox, so game files are not distributed</span>
+      </div>
+    </div>
+
     <!-- ── SECONDARY PROJECTS GRID ── -->
     <div class="proj-grid">
 
       <!-- TYPICAL ISEKAI (PYTHON / CODEHS) -->
       <div class="proj-card">
-        <div class="pc-num">Project 02</div>
+        <div class="pc-num">Project 03</div>
         <div class="pc-title">Typical Isekai</div>
         <div class="pc-subtitle">First Original Game · Python · CodeHS</div>
         <div class="pc-desc">My first game ever made — written exclusively in Python and built up over thousands of lines of code on CodeHS. The project that started it all, long before moving into Unity and Unreal for later titles.</div>
@@ -236,7 +283,7 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
 
       <!-- ANDROID STUDIO -->
       <div class="proj-card">
-        <div class="pc-num">Project 03</div>
+        <div class="pc-num">Project 04</div>
         <div class="pc-title">Android Studio Labs</div>
         <div class="pc-subtitle">COMP 322 · Mobile App Development · 9 Labs</div>
         <img class="pc-thumb" src="ASProjects.png" alt="Android Studio Projects">
@@ -259,7 +306,7 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
 
       <!-- LEETCODE -->
       <div class="proj-card" id="lcCard">
-        <div class="pc-num">Profile · 04</div>
+        <div class="pc-num">Profile · 05</div>
         <div class="pc-title">LeetCode</div>
         <div class="pc-subtitle">Algorithms · Data Structures · Problem Solving</div>
         <div class="pc-desc">Active competitive programming practice covering arrays, hash maps, trees, graphs, dynamic programming, and more. Consistent problem solving as an ongoing discipline — not just for interviews.</div>
