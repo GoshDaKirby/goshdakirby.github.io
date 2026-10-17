@@ -73,6 +73,9 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
 .btn-primary:hover{opacity:0.88;transform:translateX(2px);}
 .btn-secondary{font-family:Arial,sans-serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.75rem 1.6rem;background:transparent;border:1px solid rgba(242,236,224,0.2);color:rgba(242,236,224,0.5);cursor:none;clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);transition:border-color 0.15s,color 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;}
 .btn-secondary:hover{border-color:rgba(232,0,26,0.5);color:var(--white);}
+.btn-repo{font-family:Arial,sans-serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.75rem 1.6rem;background:#000;border:1px solid var(--red);color:var(--red);cursor:none;font-weight:700;clip-path:polygon(0% 0%,95% 0%,100% 50%,95% 100%,0% 100%);transition:background 0.15s,color 0.15s,transform 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;}
+.btn-repo:hover{background:rgba(232,0,26,0.12);color:var(--white);transform:translateX(2px);}
+
 
 /* VIDEO EMBED inside featured card */
 .feat-video{margin:0 3rem 2.5rem;border:1px solid rgba(232,0,26,0.1);position:relative;background:#000;}
@@ -218,7 +221,8 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
       </div>
 
       <div class="feat-actions">
-        <a class="btn-primary" href="https://goshdakirby.github.io/Goin-Fishing/" target="_blank">▶ Play Now</a>
+        <a class="btn-primary" href="https://goshdakirby.github.io/Goin-Fishing/" target="_blank" rel="noopener noreferrer">▶ Play Now</a>
+        <a class="btn-repo" href="https://github.com/GoshDaKirby/Goin-Fishing" target="_blank" rel="noopener noreferrer">⬡ GitHub Repo</a>
       </div>
     </div>
 
@@ -255,7 +259,9 @@ html,body{width:100%;min-height:100%;background:var(--black);font-family:'Arial 
       </div>
 
       <div class="feat-actions">
-        <span class="feat-note">Private build · Undertale is © Toby Fox, so game files are not distributed</span>
+        <a class="btn-primary" href="https://goshdakirby.github.io/UTWeb/" target="_blank" rel="noopener noreferrer">▶ Play Now</a>
+        <a class="btn-repo" href="https://github.com/GoshDaKirby/UTWeb" target="_blank" rel="noopener noreferrer">⬡ GitHub Repo</a>
+        <span class="feat-note">Undertale is © Toby Fox, so original game files are not distributed</span>
       </div>
     </div>
 
